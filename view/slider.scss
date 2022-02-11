@@ -1,0 +1,115 @@
+.slider,
+.slider__scale,
+.slider__range,
+.slider__roller,
+.slider__display {
+  box-sizing: border-box;
+}
+
+// дефолтный слайдер
+.slider >
+input[type="range"].slider-default_hidden {
+  width: 0;
+  height: 0;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+  position: absolute;
+  opacity: 0;
+}
+
+
+// шкала и закрашиваемый диапазон
+.slider__scale,
+.slider__range {
+  border-radius: 10px;
+  box-shadow: inset 0 0 3px 3px rgba(0, 0, 0, 0.3);
+}
+
+
+// шкала
+.slider__scale {
+  background-color: #e2dede;
+  position: relative;
+
+  &_horizontal {
+    width: 100%;
+    height: 16px;
+  }
+
+  &_vertical {
+    width: 16px;
+    min-height: 150px;
+    height: 100%;
+  }
+}
+
+
+//  закрашиваемый диапазон
+.slider__range {
+  background-color: #00b4eb;
+  position: absolute;
+}
+
+.slider__scale_horizontal
+.slider__range {
+  height: 100%;
+  top: 0;
+}
+
+.slider__scale_vertical
+.slider__range {
+  width: 100%;
+  bottom: 0;
+}
+
+
+// ползунок
+.slider__roller-1,
+.slider__roller-2 {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+
+  border-radius: 50%;
+  box-shadow: inset 0 0 3px 3px rgba(0, 0, 0, 0.3);
+  background-color: #eee;
+  cursor: pointer;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    position:absolute;
+    top: 12px;
+    left: 12px;
+
+    transform: translate(-50%, -50%);
+    background-color: #00b4eb;
+    border-radius: 50%;
+    box-shadow: inset 0 0 3px 1px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.slider__scale_horizontal
+.slider__roller-1 {
+  top: -4px;
+}
+
+.slider__scale_horizontal
+.slider__roller-2 {
+  top: -4px;
+  right: 0;
+}
+
+.slider__scale_vertical
+.slider__roller-1 {
+  bottom: 0;
+  left: -4px;
+}
+
+.slider__scale_vertical
+.slider__roller-2 {
+  top: 0;
+  left: -4px;
+}
