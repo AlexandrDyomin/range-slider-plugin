@@ -1,6 +1,8 @@
+import SliderController from "../controller/SliderContrller";
 import Roller from "../model/Roller";
 import Scale from"../model/Scale";
 import Slider from "../model/Slider";
+import SliderView from "../view/SliderView";
 
 // тип настроек слайдера
 type sliderSettings = {
@@ -11,14 +13,14 @@ type sliderSettings = {
   range?: boolean,
   value?: number,
   values? :[number, number],
-  create?(event: Event, ui: SliderController): void,
-  start?(event: Event, ui: SliderController): void,
-  slide?(event: Event, ui: SliderController): void,
-  stop?(event: Event, ui: SliderController): void,
-  change?(event: Event, ui: SliderController): void
+  // create?(event: Event, ui: SliderController): void,
+  // start?(event: Event, ui: SliderController): void,
+  // slide?(event: Event, ui: SliderController): void,
+  // stop?(event: Event, ui: SliderController): void,
+  // change?(event: Event, ui: SliderController): void
 };
 
-function slider(container: string, settings: sliderSettings) {
+function slider(container: string, settings: sliderSettings = {}) {
   // дефолтные настройки слайдера
   let defaultSettings: sliderSettings = {
     min: 0,
@@ -27,15 +29,15 @@ function slider(container: string, settings: sliderSettings) {
     type: "horizontal",
     range: false,
     value: 50,
-    create(event: Event, ui: SliderController): void{},
-    start(event: Event, ui: SliderController): void{},
-    slide(event: Event, ui: SliderController): void{},
-    stop(event: Event, ui: SliderController): void{},
-    change(event: Event, ui: SliderController): void{}
+    // create(event: Event, ui: SliderController): void{},
+    // start(event: Event, ui: SliderController): void{},
+    // slide(event: Event, ui: SliderController): void{},
+    // stop(event: Event, ui: SliderController): void{},
+    // change(event: Event, ui: SliderController): void{}
   };
 
   // если слайдер с диапазоном зададим значения для бегунков
-  if (settings.range === true) {
+  if (settings.range) {
     defaultSettings.values = [defaultSettings.min!, defaultSettings.max!];
   }
 
@@ -54,9 +56,18 @@ function slider(container: string, settings: sliderSettings) {
   // создадим слайдер
   let slider: Slider = new Slider(rollers, scale);
 
-  // создадим view слайдера
+  // массив с дом-элементами контейнера
+  let containers: Element[] = [...document.querySelectorAll(`.${ container }`)];
 
-  // создадим контроллер слайдера
+  // для каждого контейнера создадим view и контроллер
+  let view;
+  let ctrl;
+  containers.forEach( item => {
+    view = new SliderView(item, settings);
+    ctrl = new SliderController(view, slider);
+  });
+
+
 
   // возвратим контроллер
 
@@ -67,4 +78,5 @@ function slider(container: string, settings: sliderSettings) {
 }
 
 
+export default slider;
 export type { sliderSettings };

@@ -64,8 +64,8 @@ input[type="range"].slider-default_hidden {
 
 
 // ползунок
-.slider__roller-1,
-.slider__roller-2 {
+.slider__roller_first,
+.slider__roller_second {
   width: 24px;
   height: 24px;
   position: absolute;
@@ -92,24 +92,24 @@ input[type="range"].slider-default_hidden {
 }
 
 .slider__scale_horizontal
-.slider__roller-1 {
+.slider__roller_first {
   top: -4px;
 }
 
 .slider__scale_horizontal
-.slider__roller-2 {
+.slider__roller_second {
   top: -4px;
   right: 0;
 }
 
 .slider__scale_vertical
-.slider__roller-1 {
+.slider__roller_first {
   bottom: 0;
   left: -4px;
 }
 
 .slider__scale_vertical
-.slider__roller-2 {
+.slider__roller_second {
   top: 0;
   left: -4px;
 }

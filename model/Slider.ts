@@ -4,12 +4,12 @@ import type { IScale } from "./Scale";
 
 interface ISlider extends IScale{
   // геттер и сеттер
-  value: [number, number?] | number;
+  value: [number, number] | number;
   setValue(value: number, descriptor: number): void;
 };
 
 
-class SimpleSlider implements ISlider {
+class Slider implements ISlider {
   constructor(
     private rollers:[IRoller, IRoller?],
     private scale: IScale
@@ -17,7 +17,8 @@ class SimpleSlider implements ISlider {
 
   get value(): [number, number] | number  {
     return this.rollers.length === 2 ?
-      [this.rollers[0].value, this.rollers[1]!.value] : this.rollers[0].value;
+      [this.rollers[0].value, this.rollers[1]!.value] :
+      this.rollers[0].value;
   }
 
   setValue(value: number, descriptor: number): void {
@@ -63,4 +64,4 @@ class SimpleSlider implements ISlider {
 }
 
 
-export default SimpleSlider;
+export default Slider;

@@ -3,6 +3,7 @@ import type { sliderSettings } from "../factory/slider";
 
 interface ISliderView {
   updateValue(value: number): void;
+  rollers: NodeList; // геттер
 }
 
 
@@ -42,6 +43,11 @@ class SliderView implements ISliderView {
   // обновляет отображение слайдера
   updateValue(): void {
     console.log("yoyoyo");
+  }
+
+  // возвращает бегунки
+  get rollers(): NodeList {
+    return this._rollers;
   }
 }
 
