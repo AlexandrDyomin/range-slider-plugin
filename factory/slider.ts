@@ -3,7 +3,7 @@ import Scale from"../model/Scale";
 import Slider from "../model/Slider";
 
 // тип настроек слайдера
-type settings = {
+type sliderSettings = {
   min?: number,
   max?: number,
   step?: number,
@@ -18,9 +18,9 @@ type settings = {
   change?(event: Event, ui: SliderController): void
 };
 
-function slider(settings: settings) {
+function slider(container: string, settings: sliderSettings) {
   // дефолтные настройки слайдера
-  let defaultSettings: settings = {
+  let defaultSettings: sliderSettings = {
     min: 0,
     max: 100,
     step: 1,
@@ -65,3 +65,6 @@ function slider(settings: settings) {
 
 
 }
+
+
+export type { sliderSettings };
