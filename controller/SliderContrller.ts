@@ -1,5 +1,8 @@
 import Slider from "../model/Slider";
 import SliderView from "../view/SliderView";
+import type ISliderView from "../view/SliderView";
+import type ISlider from "../model/Slider";
+
 
 interface ISliderContriller {
   // геттер и сеттер
@@ -9,17 +12,30 @@ interface ISliderContriller {
 
 
 class SliderController implements ISliderContriller {
-  private _view: SliderView; // view слайдера
-  private _slider: Slider; // модель слайдера
+  private _view: ISliderView; // view слайдера
+  private _slider: ISlider; // модель слайдера
+  private _classesOfRollers: [string, string?]; // классы бегунков
 
-  constructor(rollers: SliderView, slider: Slider) {
-    this._view = rollers;
+  constructor(view: SliderView, slider: Slider) {
+    this._view = view;
     this._slider = slider;
 
-    // добавим обработчик на событие touchstart на бегунках
-    this._view.rollers.forEach( (item: Node) => {
-      item.addEventListener("pointerdown", () => this._view.updateValue.apply(this._view) );
-    });
+    // укажем контекст выполнения для обработчиков
+    this._handleContainerPointerdown = this._handleContainerPointerdown.bind(this);
+    this._handleDocumentPointermove = this._handleDocumentPointermove.bind(this);
+    this._handleContainerPointerup = this._handleContainerPointerup.bind(this);
+
+    // добавим обработчики на события pointerdown, pointermove, pointerup
+    this._view.container.addEventListener("pointerdown", this._handleContainerPointerdown);
+    this._view.container.addEventListener("pointerup", this._handleContainerPointerup);
+
+    // сохраним значения атрибута class бегунков в кортеж
+    this._view.settings.range ?
+      this._classesOfRollers = [
+        (<HTMLElement>this._view.rollers[0]).className,
+        (<HTMLElement>this._view.rollers[1])?.className,
+      ] :
+      this._classesOfRollers = [(<HTMLElement>this._view.rollers[0]).className];
   }
 
   // возвращает значения бегунков
@@ -28,13 +44,32 @@ class SliderController implements ISliderContriller {
   }
 
   // устанавливает значния бегунков
-  setValue(value: number, descriptor: number): void {
-    this._view.updateValue();
+  setValue(value: number, descriptor: number = 0): void {
+    this._view.updateValue(value, descriptor);
     this._slider.setValue(value, descriptor);
   }
 
+  // обработчики событий указателя
+  _handleContainerPointerdown(e: Event): void {
+    document.addEventListener("pointermove", this._handleDocumentPointermove);
 
+    let target: HTMLElement = e.target as HTMLElement;
+    if (target.className === this._classesOfRollers[0]) {
+      console.log(this._classesOfRollers);
+    }
 
+    if (target.className === this._classesOfRollers[1]) {
+      console.log(2)
+    }
+
+  }
+  _handleDocumentPointermove(e: Event): void {
+    console.log("move");
+  }
+  _handleContainerPointerup(e: Event): void {
+    document.removeEventListener("pointermove", this._handleDocumentPointermove);
+    console.log("remove");
+  }
 }
 
 

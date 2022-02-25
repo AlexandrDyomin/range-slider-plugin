@@ -2,8 +2,11 @@ import type { sliderSettings } from "../factory/slider";
 
 
 interface ISliderView {
-  updateValue(value: number): void;
-  rollers: NodeList; // геттер
+  updateValue(value: number, descriptor: number): void;
+  // геттеры
+  rollers: NodeList;
+  container: HTMLElement;
+  settings: sliderSettings;
 }
 
 
@@ -12,12 +15,12 @@ class SliderView implements ISliderView {
   private _rollers: NodeList; // хранит бегунки
 
   constructor(
-    private _container: Element, // контейнер, в котором будет расположен слайдер
+    private _container: HTMLElement, // контейнер, в котором будет расположен слайдер
     private _settings: sliderSettings // настройки слайдера
     ) {
       this._template = this._getTemplate();
       this._render();
-      this._rollers = _container.querySelectorAll(".slider__roller");
+      this._rollers = this._container.querySelectorAll(".slider__roller");
   }
 
   // вставляет шаблон слайдера в контейнер
@@ -41,14 +44,27 @@ class SliderView implements ISliderView {
   }
 
   // обновляет отображение слайдера
-  updateValue(): void {
-    console.log("yoyoyo");
+  updateValue(value: number, descriptor: number): void {
+    let isHorizontal = this._settings.type === "horizontal";
+    (<HTMLElement>this._rollers[descriptor])
+      .style.transform = `translate${ isHorizontal ? "X" : "Y" }(${ value }px)`;
   }
 
   // возвращает бегунки
   get rollers(): NodeList {
     return this._rollers;
   }
+
+  // возвращает контейнер
+  get container(): HTMLElement {
+    return this._container;
+  }
+
+  // возвращает объект настроек
+  get settings(): sliderSettings {
+    return this._settings;
+  }
 }
 
 export default SliderView;
+export type { ISliderView };

@@ -65,3 +65,4 @@ class Slider implements ISlider {
 
 
 export default Slider;
+export type { ISlider };

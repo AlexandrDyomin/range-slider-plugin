@@ -57,24 +57,15 @@ function slider(container: string, settings: sliderSettings = {}) {
   let slider: Slider = new Slider(rollers, scale);
 
   // массив с дом-элементами контейнера
-  let containers: Element[] = [...document.querySelectorAll(`.${ container }`)];
+  let $container: HTMLElement | null = document.querySelector(container);
 
-  // для каждого контейнера создадим view и контроллер
-  let view;
-  let ctrl;
-  containers.forEach( item => {
-    view = new SliderView(item, settings);
-    ctrl = new SliderController(view, slider);
-  });
-
-
-
-  // возвратим контроллер
-
-
-
-
-
+  // создадим view и контроллер если $container существует
+  if ($container) {
+    let view = new SliderView($container, settings);
+    return new SliderController(view, slider);
+  } else {
+    throw Error(`не найден контейнер c id или классом "${container}"`);
+  }
 }
 
 
