@@ -1,79 +1,84 @@
 interface IScale{
-  // сеттеры и геттеры
-  minValue: number;
-  maxValue: number;
-  step: number;
+  getMinValue(): number;
+  setMinValue(value: number): void;
+  getMaxValue(): number;
+  setMaxValue(value: number): void;
+  getStep(): number;
+  setStep(value: number): void
 }
 
 
 class Scale implements IScale {
-  private _minValue: number = 0;
-  private _maxValue: number;
-  private _step: number = 1;
-  private _scaleSize: number;
+  private minValue: number = 0;
+  private maxValue: number;
+  private step: number = 1;
+  private scaleSize: number;
 
   constructor(
     maxValue: number,
-    minValue: number = 0,
-    step: number = 1
+    minValue: number,
+    step: number
   ) {
-    if (maxValue === minValue) minValue = this._minValue;
+      if (maxValue - minValue === 0) {
+        throw Error("Некорректный размер шкалы");
+      }
 
-    if (maxValue < minValue) {
-      [this._minValue, this._maxValue] = [maxValue, minValue];
-    } else {
-      this._minValue = minValue;
-      this._maxValue = maxValue;
-    }
+      if (maxValue === minValue) minValue = this.minValue;
 
-      this._scaleSize = this._maxValue - this._minValue;
-      this.step = step;
+      if (maxValue < minValue) {
+        [this.minValue, this.maxValue] = [maxValue, minValue];
+      } else {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+      }
+
+        this.scaleSize = this.maxValue - this.minValue;
+        this.setStep(step);
     };
 
-  get minValue(): number {
-    return this._minValue;
+  public getMinValue(): number {
+    return this.minValue;
   }
 
-  get maxValue(): number {
-    return this._maxValue;
-  }
+  public setMinValue(value: number) {
+    if (value === this.maxValue) return;
 
-  get step(): number {
-    return this._step;
-  }
-
-  set minValue(value: number) {
-    if (value === this._maxValue) return;
-
-    if (value > this._maxValue) {
-      [this._minValue, this._maxValue] = [this._minValue, value];
+    if (value > this.maxValue) {
+      [this.minValue, this.maxValue] = [this.minValue, value];
     } else {
-      this._minValue = value;
-    }
-
-  }
-
-  set maxValue(value: number) {
-    if (value === this._minValue) return;
-
-    if (value < this._minValue) {
-      [this._minValue, this._maxValue] = [value, this._minValue];
-    } else {
-      this._maxValue = value;
+      this.minValue = value;
     }
   }
 
-  set step(value: number) {
-    let isValid = this._checkStep(value, this._scaleSize)
-    if (isValid) this._step = value;
+  public getMaxValue(): number {
+    return this.maxValue;
   }
 
-  private _checkStep(step: number, scaleSize: number): boolean {
+  public setMaxValue(value: number) {
+    if (value === this.minValue) return;
+
+    if (value < this.minValue) {
+      [this.minValue, this.maxValue] = [value, this.minValue];
+    } else {
+      this.maxValue = value;
+    }
+  }
+
+  public getStep(): number {
+    return this.step;
+  }
+
+  public setStep(value: number): void {
+    let isValid = this.isValidStep(value, this.scaleSize);
+    if (!isValid) throw Error("Некорректное значение шага");
+    this.step = value;
+  }
+
+  private isValidStep(step: number, scaleSize: number): boolean {
     let isPositive: boolean = step > 0;
-    let isNoMoreScale: boolean = step <= scaleSize;
-    return isPositive && isNoMoreScale;
+    let isDividedWithoutResidue = this.maxValue % step === 0;
+    return isPositive && isDividedWithoutResidue;
   }
-
 }
 
 export default Scale;

@@ -1,20 +1,18 @@
 interface IRoller {
-  // геттер и сеттер
-  value: number;
+  getValue(): number;
+  setValue(value: number): void
 }
 
 
 class Roller implements IRoller {
-  constructor(
-    private _value: number = 0
-  ) {}
+  constructor(private value: number) {}
 
-  public get value(): number {
-    return this._value
+  public getValue(): number {
+    return this.value;
   }
 
-  public set value(value: number) {
-    this._value = value;
+  public setValue(value: number) {
+    this.value = value;
   }
 }
 

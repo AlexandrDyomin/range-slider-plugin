@@ -3,8 +3,7 @@ import type { IScale } from "./Scale";
 
 
 interface ISlider extends IScale{
-  // геттер и сеттер
-  value: [number, number] | number;
+  getValue(): [number, number] | number;
   setValue(value: number, descriptor: number): void;
 };
 
@@ -13,46 +12,58 @@ class Slider implements ISlider {
   constructor(
     private rollers:[IRoller, IRoller?],
     private scale: IScale
-  ) {}
+  ) {
+      this.rollers.forEach(roller => {
+        let isValid: boolean = this.checkValue(roller!.getValue(), this.scale.getMinValue(), this.scale.getMaxValue() )
+        if (!isValid) {
+          throw Error("Некорректное значение бегунка")
+        }
+      });
+  }
 
-  get value(): [number, number] | number  {
+  getValue(): [number, number] | number  {
     return this.rollers.length === 2 ?
-      [this.rollers[0].value, this.rollers[1]!.value] :
-      this.rollers[0].value;
+      [this.rollers[0].getValue(), this.rollers[1]!.getValue()] :
+      this.rollers[0].getValue();
   }
 
-  setValue(value: number, descriptor: number): void {
+  setValue(value: number, descriptor: number): boolean {
     let isIntoRange: boolean =
-      this._checkValue(value, this.scale.minValue, this.scale.maxValue);
+      this.checkValue(value, this.scale.getMinValue(), this.scale.getMaxValue() );
 
-    if (isIntoRange) this.rollers[descriptor]!.value = value;
+    if (isIntoRange) {
+      this.rollers[descriptor]!.setValue(value);
+      return true;
+    }
+
+    return false;
   }
 
-  get minValue(): number {
-    return this.scale.minValue;
+  getMinValue(): number {
+    return this.scale.getMinValue();
   }
 
-  get maxValue(): number {
-    return this.scale.maxValue;
+  getMaxValue(): number {
+    return this.scale.getMaxValue();
   }
 
-  get step(): number {
-    return this.scale.step;
+  getStep(): number {
+    return this.scale.getStep();
   }
 
-  set minValue(value:number) {
-    this.scale.minValue = value;
+  setMinValue(value:number) {
+    this.scale.setMinValue(value);
   }
 
-  set maxValue(value: number) {
-    this.scale.maxValue = value
+  setMaxValue(value: number) {
+    this.scale.setMaxValue(value);
   }
 
-  set step(value: number) {
-    this.scale.step = value;
+  setStep(value: number) {
+    this.scale.setStep(value);
   }
 
-  private _checkValue(
+  private checkValue(
     value:number,
     lowerValue:number,
     upperValue: number
