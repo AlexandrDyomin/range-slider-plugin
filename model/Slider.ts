@@ -27,16 +27,16 @@ class Slider implements ISlider {
       this.rollers[0].getValue();
   }
 
-  setValue(value: number, descriptor: number): boolean {
+  setValue(value: number, descriptor: number) {
     let isIntoRange: boolean =
       this.checkValue(value, this.scale.getMinValue(), this.scale.getMaxValue() );
 
     if (isIntoRange) {
       this.rollers[descriptor]!.setValue(value);
-      return true;
+    } else {
+      throw Error("Недопустимое значение бегунка");
     }
 
-    return false;
   }
 
   getMinValue(): number {

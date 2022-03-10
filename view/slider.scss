@@ -94,23 +94,19 @@ input[type="range"].slider-default_hidden {
 .slider__scale_horizontal
 .slider__roller_first {
   top: -4px;
-  left: 0;
 }
 
 .slider__scale_horizontal
 .slider__roller_second {
   top: -4px;
-  right: 0;
 }
 
 .slider__scale_vertical
 .slider__roller_first {
-  bottom: 0;
   left: -4px;
 }
 
 .slider__scale_vertical
 .slider__roller_second {
-  top: 0;
   left: -4px;
 }

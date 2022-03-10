@@ -5,8 +5,8 @@ import type ISlider from "../model/Slider";
 
 
 interface ISliderContriller {
-  value: [number, number] | number; // геттер
-  setValue(value: number, descriptor: number): void; //сеттер
+  getValue(): [number, number] | number;
+  setValue(value: number, descriptor: 0 | 1): void;
 }
 
 
@@ -26,28 +26,30 @@ class SliderController implements ISliderContriller {
     this.handleContainerPointerup = this.handleContainerPointerup.bind(this);
 
     // добавим обработчики на события pointerdown, pointermove, pointerup
-    this.view.container.addEventListener("pointerdown", this.handleContainerPointerdown);
+    this.view.getContainer().addEventListener("pointerdown", this.handleContainerPointerdown);
     document.addEventListener("pointerup", this.handleContainerPointerup);
 
     // сохраним значения атрибута class бегунков в кортеж
-    this.view.settings.range ?
+    this.view.getSettings().range ?
       this.classesOfRollers = [
-        (<HTMLElement>this.view.rollers[0]).className,
-        (<HTMLElement>this.view.rollers[1]).className,
+        (<HTMLElement>this.view.getRollers()[0]).className,
+        (<HTMLElement>this.view.getRollers()[1]).className,
       ] :
-      this.classesOfRollers = [(<HTMLElement>this.view.rollers[0]).className];
+      this.classesOfRollers = [(<HTMLElement>this.view.getRollers()[0]).className];
   }
 
   // возвращает значения бегунков
-  get value(): [number, number] | number {
-    return this.slider.value;
+  public getValue(): [number, number] | number {
+    return this.slider.getValue();
   }
 
   // устанавливает значния бегунков
-  setValue(value: number, descriptor: number = 0): void {
-    let isUpdateModel: boolean = this.slider.setValue(value, descriptor);
-    if (isUpdateModel) {
-      this.view.updateValue(null, value, descriptor);
+  public setValue(value: number, descriptor: 0 | 1 = 0): void {
+    try {
+      this.slider.setValue(value, descriptor);
+      this.view.setValue(value, descriptor);
+    } catch(e) {
+      console.error(e);
     }
   }
 
@@ -63,19 +65,11 @@ class SliderController implements ISliderContriller {
   }
 
   private handleDocumentPointermove(e: PointerEvent): void {
-    // let coordinate: number; // координаты по оси X или Y в зависимости от типа слайдера
-    // let isHorizontal = this.view.settings.type === "horizontal";
-    // isHorizontal ? coordinate = e.clientX : coordinate = e.clientY;
-
-    // let width: number = +getComputedStyle(this.view.container).width.replace("px", ""); // длина слайдера
-    // console.log(width)
-
-
-    // isHorizontal ?
-    //   this.currentRoller!.style.left = `${ (coordinate / width) * 100 - (24/ width)*100 }%` :
-    //   this.currentRoller!.style.top = `${ coordinate }px`;
-    // console.log(e)
-    this.view.updateValue(e);
+    this.view.setValue(e);
+    // let value: number = this.view.setValue(e);
+    // if (value) {
+    //   this.slider.setValue();
+    // }
   }
 
   private handleContainerPointerup(e: PointerEvent): void {
@@ -93,3 +87,4 @@ class SliderController implements ISliderContriller {
 
 
 export default SliderController;
+export type { ISliderContriller };

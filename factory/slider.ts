@@ -6,21 +6,21 @@ import SliderController from "../controller/SliderContrller";
 
 // тип настроек слайдера
 type sliderSettings = {
-  min?: number,
-  max?: number,
-  step?: number,
-  type?: "horizontal" | "vertical",
-  range?: boolean,
+  min: number,
+  max: number,
+  step: number,
+  type: "horizontal" | "vertical",
+  range: boolean,
   value?: number,
-  values? :[number, number],
-  // create?(event: Event, ui: SliderController): void,
-  // start?(event: Event, ui: SliderController): void,
-  // slide?(event: Event, ui: SliderController): void,
-  // stop?(event: Event, ui: SliderController): void,
-  // change?(event: Event, ui: SliderController): void
+  values?:[number, number],
+  // create(event: Event, ui: SliderController): void,
+  // start(event: Event, ui: SliderController): void,
+  // slide(event: Event, ui: SliderController): void,
+  // stop(event: Event, ui: SliderController): void,
+  // change(event: Event, ui: SliderController): void
 };
 
-function slider(container: string, settings: sliderSettings = {}) {
+function slider(container: string, userSettings: Object = {}) {
   // дефолтные настройки слайдера
   let defaultSettings: sliderSettings = {
     min: 0,
@@ -35,26 +35,30 @@ function slider(container: string, settings: sliderSettings = {}) {
     // change(event: Event, ui: SliderController): void{}
   };
 
-  // зададим  дефолтное значение слайдера
-  if (settings.range) {
-    defaultSettings.values = [defaultSettings.min!, defaultSettings.max!];
-  } else {
-    defaultSettings.value = 50;
-  }
+  // объединим дефолтные настройки с пользовательскими
+  let settings: sliderSettings = { ...defaultSettings, ...userSettings };
 
   // если пользователь перепутал поля для минимального и
   // максимального значений шкалы поменяем занчения местами
-  if (settings.min && settings.max && settings.min > settings.max) {
+  let isWrongOrder: boolean = settings.min > settings.max
+  if (isWrongOrder) {
     [settings.min, settings.max] = [settings.max, settings.min];
   }
 
+  // зададим значения слайдера
+  if (settings.range && !settings.values) {
+    settings.values = [settings.min, settings.max];
+  }
+
+  if (!settings.range && !settings.value){
+    settings.value = settings.max / 2;
+  }
+
   // если порядок занчений бегунков неверный поменяим занчения местами
-  if (settings.values && settings.values[0] > settings.values[1]) {
-    settings.values.reverse();
+  if (settings.range && settings.values![0] > settings.values![1]) {
+    settings.values!.reverse();
   };
 
-  // объединим дефолтные настройки с пользовательскими
-  settings = { ...defaultSettings, ...settings };
 
   // если слайдер с диапазоном создадим два бегунка, иначе один
   let rollers: [Roller, Roller?];
@@ -63,7 +67,7 @@ function slider(container: string, settings: sliderSettings = {}) {
     rollers = [new Roller(settings.value!)];
 
   // создадим шкалу
-  let scale: Scale = new Scale(settings.max!, settings.min!, settings.step!);
+  let scale: Scale = new Scale(settings.max, settings.min, settings.step);
 
   // создадим слайдер
   let slider: Slider = new Slider(rollers, scale);
