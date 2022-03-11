@@ -37,8 +37,6 @@ class SliderView implements ISliderView {
     // отобразим слайдер на странице
     this.render();
 
-
-
     this.scale = this.container.querySelector(".slider__scale")!;
     this.range = this.container.querySelector(".slider__range")!;
     this.rollers = this.container.querySelectorAll(".slider__roller");
@@ -53,7 +51,6 @@ class SliderView implements ISliderView {
     } else {
       this.offsetScale = this.scale.getBoundingClientRect().top;
     }
-
 
     if (this.settings.range) {
       this.inputs = document.querySelectorAll(".slider > input");
@@ -75,12 +72,8 @@ class SliderView implements ISliderView {
 
   // передвигает бегунок и обновляет input
   public setValue(value: number | PointerEvent, descriptor: 0 | 1 = 0): void {
-    // вычислим смещение бегунка относительно шкалы в процентах
-    let position: number = this.calcPosition(value);
-
     let indexOfRoller: 0 | 1;
     let inputValue: number;
-
     // вычислим значение ролика и его номер
     if (typeof value === "number") {
       indexOfRoller = descriptor;
@@ -89,6 +82,9 @@ class SliderView implements ISliderView {
       indexOfRoller = this.indexOfRoller!;
       inputValue = this.calcValue(value);
     }
+
+    // вычислим смещение бегунка относительно шкалы в процентах
+    let position: number = this.calcPosition(value);
 
     // переместим бегунок
     this.slide(position, indexOfRoller);
@@ -107,7 +103,6 @@ class SliderView implements ISliderView {
     } else {
       this. indexOfRoller = 1;
     }
-
 
     // вычислим смещение ролика относительно окна
     if (this.settings.type === "horizontal") {
@@ -237,7 +232,7 @@ class SliderView implements ISliderView {
 
   // расчитывает смещение бегунка в процентах относительно шкалы
   private calcPosition(value: number | PointerEvent): number {
-    // вычислим смещение бегунка относительно шкалы шкале
+    // вычислим смещение бегунка относительно шкалы
     let position: number;
     if (typeof value === "number") {
       position = value / (this.settings.max - this.settings.min);
@@ -297,43 +292,19 @@ class SliderView implements ISliderView {
   }
 
   private paintRange(): void {
-    let { start, end, size } = this.getPropsRange();
-
-    // установим размер диапазона
     if (this.settings.type === "horizontal"){
-      this.range.style.width = `${ size }px`;
-      this.range.style.left = start + "px";
+      let start: number = +(<HTMLElement>this.rollers[0]).style.left.replace("px", "");
+      let end: number = +(<HTMLElement>this.rollers[1]).style.left.replace("px", "");
+      end = this.sizeScale - this.sizeRoller - end;
+      this.range.style.left = `${ start }px`;
+      this.range.style.right = `${ end }px`;
     } else {
-      this.range.style.height = `${ size }px`;
-      this.range.style.top = start + "px";
+      let start: number = +(<HTMLElement>this.rollers[0]).style.top.replace("px", "");
+      let end: number = +(<HTMLElement>this.rollers[1]).style.top.replace("px", "");
+      start = this.sizeScale - this.sizeRoller - start;
+      this.range.style.bottom = `${ start }px`;
+      this.range.style.top = `${ end }px`;
     }
-  }
-
-  private getPropsRange(): {start: number, end: number, size: number} {
-    let start: number;
-    let end: number;
-    let size: number;
-
-    if (this.settings.range) {
-      if (this.settings.type === "vertical") {
-        start = +(<HTMLElement>this.rollers[1]).style.top.replace("px", "");
-        end = +(<HTMLElement>this.rollers[0]).style.top.replace("px", "") + this.sizeRoller;
-      } else {
-        start = +(<HTMLElement>this.rollers[0]).style.left.replace("px", "");
-        end = +(<HTMLElement>this.rollers[1]).style.left.replace("px", "") + this.sizeRoller;
-      }
-    } else {
-      if (this.settings.type === "vertical") {
-        end = this.sizeScale;
-        start = +(<HTMLElement>this.rollers[0]).style.top.replace("px", "");
-      } else{
-        start = 0;
-        end = +(<HTMLElement>this.rollers[0]).style.left.replace("px", "") + this.sizeRoller;
-      }
-    }
-
-    size = Math.abs(end - start);
-    return {start, end, size};
   }
 }
 

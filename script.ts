@@ -8,5 +8,5 @@ let sl: SliderController = slider("sl", {
   max: 50,
   values: [0,25],
   step:10,
-  type: "vertical"
 });
+// type: "vertical"
