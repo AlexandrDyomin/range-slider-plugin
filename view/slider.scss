@@ -48,6 +48,10 @@ input[type="range"].slider-default_hidden {
 .slider__range {
   background-color: #00b4eb;
   position: absolute;
+  transition: left .2s linear,
+              right .2s linear,
+              top .2s linear,
+              bottom .2s linear;
 }
 
 .slider__scale_horizontal
@@ -63,7 +67,7 @@ input[type="range"].slider-default_hidden {
 }
 
 
-// ползунок
+// бегунки
 .slider__roller_first,
 .slider__roller_second {
   width: 24px;
@@ -73,7 +77,10 @@ input[type="range"].slider-default_hidden {
   border-radius: 50%;
   box-shadow: inset 0 0 3px 3px rgba(0, 0, 0, 0.3);
   background-color: #eee;
+
   cursor: pointer;
+  transition: left .2s linear,
+              top .2s linear;
 
   &::after {
     content: "";
@@ -94,6 +101,7 @@ input[type="range"].slider-default_hidden {
 .slider__scale_horizontal
 .slider__roller_first {
   top: -4px;
+  left: 0;
 }
 
 .slider__scale_horizontal
@@ -109,4 +117,5 @@ input[type="range"].slider-default_hidden {
 .slider__scale_vertical
 .slider__roller_second {
   left: -4px;
+  top: 0;
 }

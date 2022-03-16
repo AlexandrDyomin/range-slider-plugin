@@ -1,22 +1,20 @@
-import Slider from "../model/Slider";
-import SliderView from "../view/SliderView";
+import type ISliderModel from "../model/SliderModel";
 import type ISliderView from "../view/SliderView";
-import type ISlider from "../model/Slider";
 
 
-interface ISliderContriller {
+interface ISliderController {
   getValue(): [number, number] | number;
   setValue(value: number, descriptor: 0 | 1): void;
 }
 
 
-class SliderController implements ISliderContriller {
+class SliderController implements ISliderController {
   private view: ISliderView; // view слайдера
-  private slider: ISlider; // модель слайдера
+  private slider: ISliderModel; // модель слайдера
   private classesOfRollers: [string, string?]; // классы бегунков
   private currentRoller: HTMLElement | null = null;
 
-  constructor(view: SliderView, slider: Slider) {
+  constructor(view: ISliderView, slider: ISliderModel) {
     this.view = view;
     this.slider = slider;
 
@@ -65,11 +63,14 @@ class SliderController implements ISliderContriller {
   }
 
   private handleDocumentPointermove(e: PointerEvent): void {
-    this.view.setValue(e);
-    // let value: number = this.view.setValue(e);
-    // if (value) {
-    //   this.slider.setValue();
-    // }
+    // обновим view
+    let props = this.view.setValue(e);
+
+    // если бегунок перемещен обновим модель
+    if (props) {
+      let { value, descriptor } = props;
+      this.slider.setValue(value, descriptor);
+    }
   }
 
   private handleContainerPointerup(e: PointerEvent): void {
@@ -87,4 +88,4 @@ class SliderController implements ISliderContriller {
 
 
 export default SliderController;
-export type { ISliderContriller };
+export type { ISliderController };

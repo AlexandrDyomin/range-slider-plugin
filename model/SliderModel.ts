@@ -2,19 +2,19 @@ import type { IRoller } from "./Roller";
 import type { IScale } from "./Scale";
 
 
-interface ISlider extends IScale{
+interface ISliderModel extends IScale{
   getValue(): [number, number] | number;
   setValue(value: number, descriptor: number): void;
 };
 
 
-class Slider implements ISlider {
+class SliderModel implements ISliderModel {
   constructor(
     private rollers:[IRoller, IRoller?],
     private scale: IScale
   ) {
-      this.rollers.forEach(roller => {
-        let isValid: boolean = this.checkValue(roller!.getValue(), this.scale.getMinValue(), this.scale.getMaxValue() )
+      this.rollers.forEach( (roller, i) => {
+        let isValid: boolean = this.checkValue(roller!.getValue(), i)
         if (!isValid) {
           throw Error("Некорректное значение бегунка")
         }
@@ -29,12 +29,12 @@ class Slider implements ISlider {
 
   setValue(value: number, descriptor: number) {
     let isIntoRange: boolean =
-      this.checkValue(value, this.scale.getMinValue(), this.scale.getMaxValue() );
+      this.checkValue(value, descriptor);
 
     if (isIntoRange) {
       this.rollers[descriptor]!.setValue(value);
     } else {
-      throw Error("Недопустимое значение бегунка");
+      throw Error("Некорректное значение бегунка");
     }
 
   }
@@ -63,17 +63,30 @@ class Slider implements ISlider {
     this.scale.setStep(value);
   }
 
-  private checkValue(
-    value:number,
-    lowerValue:number,
-    upperValue: number
-  ): boolean {
-    let isNotLess: boolean = value >= lowerValue;
-    let isNotMore: boolean = value <= upperValue;
-    return isNotLess && isNotMore;
+  private checkValue(value:number, descriptor: number): boolean {
+    let min: number;
+    let max: number;
+
+    if (this.rollers[1]) {
+      if (descriptor === 0) {
+        min = this.scale.getMinValue();
+        max = this.rollers[1].getValue();
+      } else {
+        min = this.rollers[0].getValue();
+        max = this.scale.getMaxValue();
+      }
+    } else {
+      min = this.scale.getMinValue();
+      max = this.scale.getMaxValue();
+    }
+
+    let isNotLess: boolean = value >= min;
+    let isNotMore: boolean = value <= max;
+    let isDevided: boolean = value % this.scale.getStep() === 0;
+    return isNotLess && isNotMore && isDevided;
   }
 }
 
 
-export default Slider;
-export type { ISlider };
+export default SliderModel;
+export type { ISliderModel };

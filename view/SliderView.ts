@@ -1,13 +1,16 @@
-import type { sliderSettings } from "../factory/slider";
-import Roller from "../model/Roller";
+import type { sliderSettings } from "../Slider";
 
 
 interface ISliderView {
-  setValue(value: number | PointerEvent, descriptor?: 0 | 1): void;
-  // геттеры
+  setValue(
+    value: number | PointerEvent,
+    descriptor?: 0 | 1
+  ): {value: number, descriptor: number} | null;
   getRollers(): NodeList;
   getContainer(): HTMLElement;
   getSettings(): sliderSettings;
+  takeRoller(roller: HTMLElement): void;
+  throwRoller(roller: HTMLElement): void
 }
 
 
@@ -28,6 +31,7 @@ class SliderView implements ISliderView {
   private indexOfRoller: 0 | 1 | null = null;            // индекс ролика, на котором совершен клик
   private offsetRoller: number | null = null;            // смещение выбранного ролика относительно окна, px
   private defaultSlider: HTMLInputElement | null = null; // стандартный слайдер
+  private previousVal: number | null = null;
 
   constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;
@@ -71,7 +75,10 @@ class SliderView implements ISliderView {
   }
 
   // передвигает бегунок и обновляет input
-  public setValue(value: number | PointerEvent, descriptor: 0 | 1 = 0): void {
+  public setValue(
+    value: number | PointerEvent,
+    descriptor: 0 | 1 = 0
+  ): { value: number, descriptor: number } | null {
     let indexOfRoller: 0 | 1;
     let inputValue: number;
     // вычислим значение ролика и его номер
@@ -83,17 +90,32 @@ class SliderView implements ISliderView {
       inputValue = this.calcValue(value);
     }
 
-    // вычислим смещение бегунка относительно шкалы в процентах
+    // вычислим смещение бегунка относительно шкалы
     let position: number = this.calcPosition(value);
+    let previousPosition: number;
+    if (this.settings.type === "horizontal") {
+      previousPosition = +(<HTMLElement>this.rollers[indexOfRoller]).style.left.replace("px", "");
+    } else {
+      previousPosition = +(<HTMLElement>this.rollers[indexOfRoller]).style.top.replace("px", "");
+    }
 
-    // переместим бегунок
-    this.slide(position, indexOfRoller);
+    if (position !== previousPosition) {
+      // переместим бегунок
+      this.slide(position, indexOfRoller);
 
-    // обновим значение инпута
-    this.updateInput(inputValue, indexOfRoller);
+      // обновим значение инпута
+      this.updateInput(inputValue, indexOfRoller);
 
-    // закрасим диапазон
-    this.paintRange();
+      // закрасим диапазон
+      this.paintRange();
+
+      return {
+        value: inputValue,
+        descriptor: indexOfRoller
+      };
+    } else {
+      return null;
+    }
   }
 
   public takeRoller(roller: HTMLElement): void {
@@ -106,12 +128,15 @@ class SliderView implements ISliderView {
 
     // вычислим смещение ролика относительно окна
     if (this.settings.type === "horizontal") {
-      this.offsetRoller = roller.getBoundingClientRect().left;
+      // this.offsetRoller = roller.getBoundingClientRect().left;
+      this.previousVal = +roller.style.left.replace("px", "");
     }
 
     if (this.settings.type === "vertical") {
-      this.offsetRoller = roller.getBoundingClientRect().top;
+      // this.offsetRoller = roller.getBoundingClientRect().top;
+      this.previousVal = +roller.style.top.replace("px", "");
     }
+
 
     // вычислим максимально и минимально допустимые смещения относительно шкалы для ролика
     if (this.settings.range) {
@@ -193,6 +218,8 @@ class SliderView implements ISliderView {
     if (this.settings.type === "vertical") {
       (<HTMLElement>this.rollers[descriptor]).style.top = `${ position }px`;
     }
+
+    this.previousVal = position;
   }
 
   private getSizeElement(element: HTMLElement): number {
@@ -230,7 +257,7 @@ class SliderView implements ISliderView {
     this.container.innerHTML = this.template;
   }
 
-  // расчитывает смещение бегунка в процентах относительно шкалы
+  // расчитывает смещение бегунка относительно шкалы
   private calcPosition(value: number | PointerEvent): number {
     // вычислим смещение бегунка относительно шкалы
     let position: number;
@@ -248,6 +275,7 @@ class SliderView implements ISliderView {
     } else {
       position = value.clientX - this.offsetScale;
     }
+
     position -= this.sizeRoller/2;
 
     // если курсор не в допустимом диапазоне вернем ближайшее допустимое значение
@@ -257,6 +285,32 @@ class SliderView implements ISliderView {
     if (position < this.minLimit) {
       return this.minLimit;
     }
+
+    // вычислим размер шага в пикселях
+    let step: number = this.settings.step / (this.settings.max - this.settings.min);
+    step =  step * (this.sizeScale - this.sizeRoller);
+    let halfStep: number = step / 2;
+
+    if (position > this.previousVal!) {
+
+      let nextValue: number = this.previousVal! + step;
+      if (position >= nextValue - halfStep) {
+        position = nextValue;
+      } else {
+        position = this.previousVal!;
+      }
+
+    } else {
+
+      let nextValue: number = this.previousVal! - step;
+      if (position <= nextValue + halfStep) {
+        position = nextValue;
+      } else {
+        position = this.previousVal!;
+      }
+
+    }
+
     return position;
   }
 
