@@ -31,7 +31,7 @@ class SliderView implements ISliderView {
   private indexOfRoller: 0 | 1 | null = null;            // индекс ролика, на котором совершен клик
   private offsetRoller: number | null = null;            // смещение выбранного ролика относительно окна, px
   private defaultSlider: HTMLInputElement | null = null; // стандартный слайдер
-  private previousVal: number | null = null;
+  private previousPos: number | null = null;
 
   constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;
@@ -79,39 +79,34 @@ class SliderView implements ISliderView {
     value: number | PointerEvent,
     descriptor: 0 | 1 = 0
   ): { value: number, descriptor: number } | null {
-    let indexOfRoller: 0 | 1;
-    let inputValue: number;
-    // вычислим значение ролика и его номер
-    if (typeof value === "number") {
-      indexOfRoller = descriptor;
-      inputValue = value;
-    } else {
-      indexOfRoller = this.indexOfRoller!;
-      inputValue = this.calcValue(value);
-    }
-
     // вычислим смещение бегунка относительно шкалы
     let position: number = this.calcPosition(value);
-    let previousPosition: number;
-    if (this.settings.type === "horizontal") {
-      previousPosition = +(<HTMLElement>this.rollers[indexOfRoller]).style.left.replace("px", "");
-    } else {
-      previousPosition = +(<HTMLElement>this.rollers[indexOfRoller]).style.top.replace("px", "");
-    }
 
-    if (position !== previousPosition) {
+    // вычислим значение ролика и его номер
+    if (position !== this.previousPos) {
+      // let indexOfRoller: 0 | 1;
+      let inputValue: number;
+      if (typeof value === "number") {
+        this. indexOfRoller = descriptor;
+        inputValue = value;
+      } else {
+        // indexOfRoller = this.indexOfRoller!;
+        inputValue = this.calcValue(position);
+      }
+
       // переместим бегунок
-      this.slide(position, indexOfRoller);
+      this.slide(position, this.indexOfRoller!);
+
 
       // обновим значение инпута
-      this.updateInput(inputValue, indexOfRoller);
+      this.updateInput(inputValue, this.indexOfRoller!);
 
       // закрасим диапазон
       this.paintRange();
 
       return {
         value: inputValue,
-        descriptor: indexOfRoller
+        descriptor: this.indexOfRoller!
       };
     } else {
       return null;
@@ -129,12 +124,12 @@ class SliderView implements ISliderView {
     // вычислим смещение ролика относительно окна
     if (this.settings.type === "horizontal") {
       // this.offsetRoller = roller.getBoundingClientRect().left;
-      this.previousVal = +roller.style.left.replace("px", "");
+      this.previousPos = +roller.style.left.replace("px", "");
     }
 
     if (this.settings.type === "vertical") {
       // this.offsetRoller = roller.getBoundingClientRect().top;
-      this.previousVal = +roller.style.top.replace("px", "");
+      this.previousPos = +roller.style.top.replace("px", "");
     }
 
 
@@ -194,19 +189,11 @@ class SliderView implements ISliderView {
   }
 
   // вычисляет значение бегунка
-  private calcValue(e: PointerEvent): number {
-    let roller: HTMLElement = <HTMLElement>this.rollers[this.indexOfRoller!];
-
-    // найдем позицию ролика на шкале
-    let position: number;
-    if (this.settings.type === "vertical") {
-      position = +roller.style.top.replace("px", "");
-    } else {
-      position = +roller.style.left.replace("px", "");
-    }
-
+  private calcValue(position: number): number {
     // вычислим и вернем значение ролика
-    return Math.round(this.settings.max * position / 100 * (1 + this.shareOfRoller) );
+    let value: number = position / (this.sizeScale - this.sizeRoller);
+    value = value * (this.settings.max - this.settings.min);
+    return value;
   }
 
   private slide(position: number, descriptor: 0 | 1): void {
@@ -219,7 +206,7 @@ class SliderView implements ISliderView {
       (<HTMLElement>this.rollers[descriptor]).style.top = `${ position }px`;
     }
 
-    this.previousVal = position;
+    this.previousPos = position;
   }
 
   private getSizeElement(element: HTMLElement): number {
@@ -291,24 +278,23 @@ class SliderView implements ISliderView {
     step =  step * (this.sizeScale - this.sizeRoller);
     let halfStep: number = step / 2;
 
-    if (position > this.previousVal!) {
+    if (position > this.previousPos!) {
 
-      let nextValue: number = this.previousVal! + step;
+      let nextValue: number = this.previousPos! + step;
       if (position >= nextValue - halfStep) {
         position = nextValue;
       } else {
-        position = this.previousVal!;
+        position = this.previousPos!;
       }
 
     } else {
 
-      let nextValue: number = this.previousVal! - step;
+      let nextValue: number = this.previousPos! - step;
       if (position <= nextValue + halfStep) {
         position = nextValue;
       } else {
-        position = this.previousVal!;
+        position = this.previousPos!;
       }
-
     }
 
     return position;

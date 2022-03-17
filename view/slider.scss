@@ -57,13 +57,13 @@ input[type="range"].slider-default_hidden {
 .slider__scale_horizontal
 .slider__range {
   height: 100%;
-  top: 0;
+  right: calc(100% - 24px);
 }
 
 .slider__scale_vertical
 .slider__range {
   width: 100%;
-  bottom: 0;
+  bottom: calc(100% - 24px);
 }
 
 
@@ -99,23 +99,18 @@ input[type="range"].slider-default_hidden {
 }
 
 .slider__scale_horizontal
-.slider__roller_first {
+.slider__roller_first,
+.slider__scale_horizontal
+.slider__roller_second {
   top: -4px;
   left: 0;
 }
 
-.slider__scale_horizontal
-.slider__roller_second {
-  top: -4px;
-}
-
 .slider__scale_vertical
-.slider__roller_first {
-  left: -4px;
-}
-
+.slider__roller_first,
 .slider__scale_vertical
 .slider__roller_second {
-  left: -4px;
   top: 0;
+  left: -4px;
 }
+
