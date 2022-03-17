@@ -24,6 +24,8 @@ type sliderSettings = {
 
 
 class Slider implements ISliderController {
+  private controller: ISliderController;
+
   constructor(container: string, userSettings: object) {
     let defaultSettings: sliderSettings = {
       min: 0,
@@ -76,18 +78,18 @@ class Slider implements ISliderController {
     // создадим view и контроллер если $container существует
     if ($container) {
       let view = new SliderView($container, settings);
-      new SliderController(view, sliderModel);
+      this.controller = new SliderController(view, sliderModel);
     } else {
       throw Error(`не найден контейнер c id "${container}"`);
     }
   }
 
   public getValue(): [number, number] | number {
-    throw Error("error");
+    return this.controller.getValue();
   }
 
   public setValue(value: number, descriptor: 0 | 1 = 0): void {
-
+    this.controller.setValue(value, descriptor);
   }
 }
 

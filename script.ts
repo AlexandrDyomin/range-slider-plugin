@@ -10,9 +10,8 @@ let sl: Slider = new Slider("sl", {
   step: 20,
 });
 
-// type: "vertical"
+sl.setValue(95, 0);
+sl.setValue(94, 1);
 
-
-// setTimeout( () => {
-//   console.log(sl.getValue());
-// }, 3000)
+// let value = sl.getValue();
+// console.log(value)

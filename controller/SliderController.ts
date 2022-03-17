@@ -1,5 +1,5 @@
-import type ISliderModel from "../model/SliderModel";
-import type ISliderView from "../view/SliderView";
+import type { ISliderModel } from "../model/SliderModel";
+import type { ISliderView } from "../view/SliderView";
 
 
 interface ISliderController {
@@ -47,7 +47,7 @@ class SliderController implements ISliderController {
       this.slider.setValue(value, descriptor);
       this.view.setValue(value, descriptor);
     } catch(e) {
-      console.error(e);
+        console.error(e);
     }
   }
 

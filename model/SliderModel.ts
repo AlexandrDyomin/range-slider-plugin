@@ -82,8 +82,7 @@ class SliderModel implements ISliderModel {
 
     let isNotLess: boolean = value >= min;
     let isNotMore: boolean = value <= max;
-    let isDevided: boolean = value % this.scale.getStep() === 0;
-    return isNotLess && isNotMore && isDevided;
+    return isNotLess && isNotMore;
   }
 }
 
