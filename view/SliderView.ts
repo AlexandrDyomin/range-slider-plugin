@@ -15,6 +15,7 @@ interface ISliderView {
 
 
 class SliderView implements ISliderView {
+  private step: number;                                  // размер шага, px
   private minLimit: number;                              // минимально допустимое смещение бегунка,px
   private maxLimit: number;                              // максимально допустимое смещение бегунка, px
   private template: string;                              // html-код слайдера
@@ -46,6 +47,8 @@ class SliderView implements ISliderView {
     this.sizeScale = this.getSizeElement(this.scale) - this.sizeRoller;
     this.minLimit = 0;
     this.maxLimit = this.sizeScale;
+    this.step = this.settings.step /
+                (this.settings.max - this.settings.min) * this.sizeScale;
 
     if (settings.type === "horizontal") {
       this.offsetScale = this.scale.getBoundingClientRect().left;
@@ -117,21 +120,13 @@ class SliderView implements ISliderView {
     }
 
     // вычислим смещение ролика относительно окна
-    if (this.settings.type === "horizontal") {
-      // this.previousPos = +roller.style.left.replace("px", "");
-      this.previousPos = this.getRollerPosition(this.indexOfRoller);
-    }
-
-    if (this.settings.type === "vertical") {
-      // this.previousPos = +roller.style.top.replace("px", "");
-      this.previousPos = this.getRollerPosition(this.indexOfRoller);
-    }
-
+    this.previousPos = this.getRollerPosition(this.indexOfRoller);
 
     // вычислим максимально и минимально допустимые смещения относительно шкалы для ролика
     if (this.settings.range) {
       this.calcLimits(roller);
     }
+
   }
 
   public throwRoller(roller: HTMLElement): void {
@@ -199,7 +194,7 @@ class SliderView implements ISliderView {
 
   // вычисляет значение бегунка
   private calcValue(position: number): number {
-    // вычислим ролика
+    // вычислим значение ролика
     let value: number = position / this.sizeScale;
     value = value * (this.settings.max - this.settings.min);
 
@@ -261,12 +256,15 @@ class SliderView implements ISliderView {
   private calcPosition(value: number | PointerEvent): number {
     // вычислим смещение бегунка относительно шкалы
     let position: number;
+
     if (typeof value === "number") {
       position = value / (this.settings.max - this.settings.min);
       position *= this.sizeScale;
+
       if (this.settings.type ==="vertical") {
         position = this.sizeScale - position
       }
+
       return position;
     }
 
@@ -282,35 +280,27 @@ class SliderView implements ISliderView {
     if (position > this.maxLimit) {
       return this.maxLimit;
     }
+
     if (position < this.minLimit) {
       return this.minLimit;
     }
 
-    // вычислим размер шага в пикселях
-    let step: number = this.settings.step / (this.settings.max - this.settings.min);
-    step =  step * this.sizeScale;
-    let halfStep: number = step / 2;
+    // вычислим на какое количество шагов необходимо сдвинуть бегунок
+    let steps = this.calcCountSteps(position);
 
-    if (position > this.previousPos!) {
-      let nextValue: number = this.previousPos! + step;
-
-      if (position >= nextValue - halfStep) {
-        position = nextValue;
-      } else {
-        position = this.previousPos!;
-      }
-
-    } else {
-      let nextValue: number = this.previousPos! - step;
-
-      if (position <= nextValue + halfStep) {
-        position = nextValue;
-      } else {
-        position = this.previousPos!;
-      }
-    }
+    position = this.previousPos! + steps;
 
     return position;
+  }
+
+  private calcCountSteps(position: number): number {
+    // вычислим смещение курсора в пикселях
+    let offset: number = position - this.previousPos!;
+
+    // вычислим на какое количество шагов необходимо сдвинуть бегунок
+    let steps: number = Math.floor(offset / this.step);
+
+    return steps;
   }
 
   // возвращает html-код слайдера
@@ -347,6 +337,7 @@ class SliderView implements ISliderView {
   private paintRange(): void {
     let start: number = this.getRollerPosition(0);
     let end: number = this.getRollerPosition(1);
+
     if (this.settings.type === "horizontal"){
       end = this.sizeScale - end;
       this.range.style.left = `${ start }px`;
