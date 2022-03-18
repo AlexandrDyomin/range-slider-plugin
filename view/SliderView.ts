@@ -15,8 +15,8 @@ interface ISliderView {
 
 
 class SliderView implements ISliderView {
-  private minLimit: number;                              // минимально допустимое смещение бегунка относительно шкалы,px
-  private maxLimit: number;                              // максимально допустимое смещение бегунка относительно шкалы, px
+  private minLimit: number;                              // минимально допустимое смещение бегунка,px
+  private maxLimit: number;                              // максимально допустимое смещение бегунка, px
   private template: string;                              // html-код слайдера
   private sizeScale: number;                             // ширина(высота) шкалы, px
   private rollers: NodeList;                             // бегунки
@@ -199,9 +199,14 @@ class SliderView implements ISliderView {
 
   // вычисляет значение бегунка
   private calcValue(position: number): number {
-    // вычислим и вернем значение ролика
+    // вычислим ролика
     let value: number = position / this.sizeScale;
     value = value * (this.settings.max - this.settings.min);
+
+    if (this.settings.type === "vertical") {
+      value = this.settings.max - value;
+    }
+
     return value;
   }
 
