@@ -56,8 +56,8 @@ class Slider implements ISliderController {
       settings.values = [settings.min, settings.max];
     }
 
-    if (!settings.range && !settings.value){
-      settings.value = settings.max / 2;
+    if (!settings.range && settings.value === undefined){
+      settings.value = settings.max / 2  + ( (settings.min - 0) / 2);
     }
 
     // если слайдер с диапазоном создадим два бегунка, иначе один

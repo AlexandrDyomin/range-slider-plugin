@@ -22,6 +22,7 @@ class SliderView implements ISliderView {
   private sizeScale: number;                             // ширина(высота) шкалы, px
   private rollers: NodeList;                             // бегунки
   private scale: HTMLElement;                            // шкала
+  private zeroOffset: number;                            // смещение нуля на шкале, px
   private range: HTMLElement;                            // закрашиваемая часть шкалы
   private sizeRoller: number;                            // ширина(высота) бегунка, px
   private offsetScale: number;                           // смещение шкалы относительно окна, px
@@ -38,7 +39,7 @@ class SliderView implements ISliderView {
     this.template = this.getTemplate();
 
     // отобразим слайдер на странице
-    this.render();
+    this.container.innerHTML = this.template;
 
     this.scale = this.container.querySelector(".slider__scale")!;
     this.range = this.container.querySelector(".slider__range")!;
@@ -48,6 +49,9 @@ class SliderView implements ISliderView {
     this.minLimit = 0;
     this.maxLimit = this.sizeScale;
     this.step = this.settings.step /
+                (this.settings.max - this.settings.min) * this.sizeScale;
+
+    this.zeroOffset = (this.settings.min - 0) /
                 (this.settings.max - this.settings.min) * this.sizeScale;
 
     if (settings.type === "horizontal") {
@@ -198,8 +202,11 @@ class SliderView implements ISliderView {
     let value: number = position / this.sizeScale;
     value = value * (this.settings.max - this.settings.min);
 
+    let offset = this.settings.min - 0;
+    value += offset;
+
     if (this.settings.type === "vertical") {
-      value = this.settings.max - value;
+      value = this.settings.max - value + offset;
     }
 
     return value;
@@ -209,9 +216,7 @@ class SliderView implements ISliderView {
     // переместим бегунок
     if (this.settings.type === "horizontal") {
       (<HTMLElement>this.rollers[descriptor]).style.left = `${ position }px`;
-    }
-
-    if (this.settings.type === "vertical") {
+    } else {
       (<HTMLElement>this.rollers[descriptor]).style.top = `${ position }px`;
     }
 
@@ -248,18 +253,16 @@ class SliderView implements ISliderView {
     }
   }
 
-  private render(): void {
-    this.container.innerHTML = this.template;
-  }
-
   // расчитывает смещение бегунка относительно шкалы
   private calcPosition(value: number | PointerEvent): number {
     // вычислим смещение бегунка относительно шкалы
     let position: number;
 
     if (typeof value === "number") {
+
       position = value / (this.settings.max - this.settings.min);
       position *= this.sizeScale;
+      position -= this.zeroOffset;
 
       if (this.settings.type ==="vertical") {
         position = this.sizeScale - position
@@ -276,7 +279,12 @@ class SliderView implements ISliderView {
 
     position -= this.sizeRoller/2;
 
-    // если курсор не в допустимом диапазоне вернем ближайшее допустимое значение
+    // вычислим на какое количество шагов необходимо сдвинуть бегунок
+    let steps = this.calcCountSteps(position);
+
+    position = this.previousPos! + steps * this.step;
+
+    // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     if (position > this.maxLimit) {
       return this.maxLimit;
     }
@@ -285,12 +293,7 @@ class SliderView implements ISliderView {
       return this.minLimit;
     }
 
-    // вычислим на какое количество шагов необходимо сдвинуть бегунок
-    let steps = this.calcCountSteps(position);
-
-    position = this.previousPos! + steps;
-
-    return position;
+    return +position.toFixed(3);
   }
 
   private calcCountSteps(position: number): number {
@@ -298,8 +301,7 @@ class SliderView implements ISliderView {
     let offset: number = position - this.previousPos!;
 
     // вычислим на какое количество шагов необходимо сдвинуть бегунок
-    let steps: number = Math.floor(offset / this.step);
-
+    let steps: number = Math.round(offset / this.step);
     return steps;
   }
 
@@ -335,15 +337,25 @@ class SliderView implements ISliderView {
   }
 
   private paintRange(): void {
-    let start: number = this.getRollerPosition(0);
-    let end: number = this.getRollerPosition(1);
+    let start: number;
+    let end: number;
+    if (this.settings.range) {
+      start = this.getRollerPosition(0);
+      end = this.getRollerPosition(1);
+    } else {
+      start = 0;
+      end = this.getRollerPosition(0);
+    }
 
     if (this.settings.type === "horizontal"){
       end = this.sizeScale - end;
       this.range.style.left = `${ start }px`;
       this.range.style.right = `${ end }px`;
     } else {
-      start = this.sizeScale - start;
+      if (this.settings.range) {
+        start = this.sizeScale - start;
+      }
+
       this.range.style.bottom = `${ start }px`;
       this.range.style.top = `${ end }px`;
     }
