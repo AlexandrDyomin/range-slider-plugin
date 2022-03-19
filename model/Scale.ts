@@ -76,8 +76,8 @@ class Scale implements IScale {
 
   private isValidStep(step: number, scaleSize: number): boolean {
     let isPositive: boolean = step > 0;
-    let isDividedWithoutResidue = this.maxValue % step === 0;
-    return isPositive && isDividedWithoutResidue;
+    let isDivided = this.maxValue - (+(this.maxValue  / step).toFixed(1) * step) === 0;
+    return isPositive && isDivided;
   }
 }
 
