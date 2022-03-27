@@ -61,9 +61,10 @@ class SliderView implements ISliderView {
     }
 
     if (this.settings.range) {
-      this.inputs = document.querySelectorAll(".slider > input");
+      this.inputs = document.querySelectorAll(`#${ this.container.id } .slider > input`);
     } else {
-      this.defaultSlider = document.querySelector(".slider-default_hidden");
+
+      this.defaultSlider = document.querySelector(`#${ this.container.id } .slider > .slider-default_hidden`);
     }
 
     // добавим объекту window обработчик на событие resize
@@ -234,6 +235,8 @@ class SliderView implements ISliderView {
   private handleDocumentResize(): void {
     // пересчитаем поля
     this.sizeScale = this.getSizeElement(this.scale) - this.sizeRoller;
+    this.step = this.settings.step /
+                (this.settings.max - this.settings.min) * this.sizeScale;
 
     // обновим позиции бегунков
     let inputValue: number;
@@ -279,21 +282,32 @@ class SliderView implements ISliderView {
 
     position -= this.sizeRoller/2;
 
+    // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
+    let validValue = this.getNearestValidValue(position);
+    if (validValue !== position) return validValue;
+
     // вычислим на какое количество шагов необходимо сдвинуть бегунок
     let steps = this.calcCountSteps(position);
 
     position = this.previousPos! + steps * this.step;
 
     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
-    if (position > this.maxLimit) {
+    validValue = this.getNearestValidValue(position);
+    if (validValue !== position) return validValue;
+
+    return +position.toFixed(3);
+  }
+
+  private getNearestValidValue(value: number): number {
+    if (value > this.maxLimit) {
       return this.maxLimit;
     }
 
-    if (position < this.minLimit) {
+    if (value < this.minLimit) {
       return this.minLimit;
     }
 
-    return +position.toFixed(3);
+    return value;
   }
 
   private calcCountSteps(position: number): number {

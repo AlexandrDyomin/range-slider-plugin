@@ -48,10 +48,6 @@ input[type="range"].slider-default_hidden {
 .slider__range {
   background-color: #00b4eb;
   position: absolute;
-  transition: left .2s linear,
-              right .2s linear,
-              top .2s linear,
-              bottom .2s linear;
 }
 
 .slider__scale_horizontal
@@ -79,8 +75,6 @@ input[type="range"].slider-default_hidden {
   background-color: #eee;
 
   cursor: pointer;
-  transition: left .2s linear,
-              top .2s linear;
 
   &::after {
     content: "";

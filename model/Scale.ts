@@ -41,7 +41,7 @@ class Scale implements IScale {
   }
 
   public setMinValue(value: number) {
-    if (value === this.maxValue) return;
+    if (value === this.maxValue) throw Error("Минимальное значение не должно быть равно максимальному");
 
     if (value > this.maxValue) {
       [this.minValue, this.maxValue] = [this.minValue, value];
@@ -81,5 +81,6 @@ class Scale implements IScale {
   }
 }
 
-export default Scale;
+
+module.exports = Scale;
 export type { IScale };
