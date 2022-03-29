@@ -1,5 +1,12 @@
 const Scale = require("./Scale.ts");
 
+describe("Scale: constructor", () => {
+  test("Should be throw error", () => {
+    expect( () => new Scale(10, 0, -4) ).toThrow();
+    expect( () => new Scale(10, 10, -1) ).toThrow();
+  });
+});
+
 
 let scale;
 beforeAll( () => {
@@ -45,16 +52,10 @@ describe("Scale: setMinValue", () => {
     expect(scale.setMinValue).toBeDefined()
   });
 
-  let min;
-  let max;
-
-  test("Should be throw Error. Min and max values should not change",
-  () => {
+  test("Should be throw Error. Min and max values should not change", () => {
     expect(() => scale.setMinValue(10) ).toThrow();
-    min = scale.getMinValue();
-    max = scale.getMaxValue();
-    expect(min).toBe(-5);
-    expect(max).toBe(10);
+    expect(scale.getMinValue() ).toBe(-5);
+    expect(scale.getMaxValue() ).toBe(10);
   });
 
   let scale;
@@ -64,18 +65,14 @@ describe("Scale: setMinValue", () => {
 
   test("The min value should be 0. The max value should not change", () => {
     scale.setMinValue(0);
-    min = scale.getMinValue();
-    max = scale.getMaxValue();
-    expect(min).toBe(0);
-    expect(max).toBe(10);
+    expect(scale.getMinValue() ).toBe(0);
+    expect(scale.getMaxValue() ).toBe(10);
   });
 
   test("The mim value should be -5. The max value should be 20", () => {
     scale.setMinValue(20);
-    min = scale.getMinValue();
-    max = scale.getMaxValue();
-    expect(min).toBe(-5);
-    expect(max).toBe(20);
+    expect(scale.getMinValue() ).toBe(-5);
+    expect(scale.getMaxValue() ).toBe(20);
   });
 });
 
@@ -85,6 +82,29 @@ describe("Scale: setMaxValue", () => {
     expect(scale.setMaxValue).toBeDefined()
   });
 
+  test("Should be throw Error. Min and max values should not change",
+  () => {
+    expect( () => scale.setMaxValue(-5) ).toThrow();
+    expect(scale.getMinValue() ).toBe(-5);
+    expect(scale.getMaxValue() ).toBe(10);
+  });
+
+  let scale;
+  beforeEach( () => {
+    scale = new Scale(10, -5, 1);
+  });
+
+  test("The max value should be 0. The min value should not change", () => {
+    scale.setMaxValue(0);
+    expect(scale.getMinValue() ).toBe(-5);
+    expect(scale.getMaxValue() ).toBe(0);
+  });
+
+  test("The max value should be -9. The min value should be 20", () => {
+    scale.setMaxValue(-9);
+    expect(scale.getMinValue() ).toBe(-9);
+    expect(scale.getMaxValue() ).toBe(-5);
+  });
 });
 
 
@@ -93,12 +113,25 @@ describe("Scale: setStep", () => {
     expect(scale.setStep).toBeDefined()
   });
 
-});
-
-
-describe("Scale: isValidStep", () => {
-  test("Should be defined", () => {
-    expect(scale.isValidStep).toBeDefined()
+  test("The step should be 0.5", () => {
+    scale.setStep(0.5);
+    expect(scale.getStep() ).toBe(0.5);
   });
 
+  test("The step should be 0.1", () => {
+    scale.setStep(0.1);
+    expect(scale.getStep() ).toBe(0.1);
+  });
+
+  test("The step should be 15", () => {
+    scale.setStep(15);
+    expect(scale.getStep() ).toBe(15);
+  });
+
+  test("Should be throw error. The step should be 0.5", () => {
+    expect( () => scale.setStep(-2) ).toThrow();
+    expect( () => scale.setStep(-1) ).toThrow();
+    expect( () => scale.setStep(-0.5) ).toThrow();
+    expect(scale.getStep() ).toBe(15);
+  });
 });

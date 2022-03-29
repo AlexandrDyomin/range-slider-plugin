@@ -19,11 +19,8 @@ class Scale implements IScale {
     minValue: number,
     step: number
   ) {
-      if (maxValue - minValue === 0) {
-        throw Error("Некорректный размер шкалы");
-      }
 
-      if (maxValue === minValue) minValue = this.minValue;
+      if (maxValue === minValue) throw Error("Некорректный размер шкалы");
 
       if (maxValue < minValue) {
         [this.minValue, this.maxValue] = [maxValue, minValue];
@@ -55,7 +52,7 @@ class Scale implements IScale {
   }
 
   public setMaxValue(value: number) {
-    if (value === this.minValue) return;
+    if (value === this.minValue) throw Error("Максиимальное значение не должно быть равно минимальному");
 
     if (value < this.minValue) {
       [this.minValue, this.maxValue] = [value, this.minValue];
@@ -69,18 +66,12 @@ class Scale implements IScale {
   }
 
   public setStep(value: number): void {
-    let isValid = this.isValidStep(value, this.scaleSize);
-    if (!isValid) throw Error("Некорректное значение шага");
+    if (value < 0) throw Error("Некорректное значение шага");
     this.step = value;
-  }
-
-  private isValidStep(step: number, scaleSize: number): boolean {
-    let isPositive: boolean = step > 0;
-    let isDivided = this.maxValue - (+(this.maxValue  / step).toFixed(1) * step) === 0;
-    return isPositive && isDivided;
   }
 }
 
 
 module.exports = Scale;
+export default Scale;
 export type { IScale };

@@ -18,4 +18,5 @@ class Roller implements IRoller {
 
 
 module.exports = Roller;
+export default Roller;
 export type { IRoller };
