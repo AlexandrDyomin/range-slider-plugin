@@ -6,11 +6,15 @@ interface ISliderView {
     value: number | PointerEvent,
     descriptor?: 0 | 1
   ): {value: number, descriptor: number} | null;
+
   getRollers(): NodeList;
   getContainer(): HTMLElement;
   getSettings(): sliderSettings;
   takeRoller(roller: HTMLElement): void;
-  throwRoller(roller: HTMLElement): void
+  throwRoller(roller: HTMLElement): void;
+  getScale(): HTMLElement;
+  getRange(): HTMLElement;
+  findNearestRoller(e: PointerEvent): void;
 }
 
 
@@ -30,7 +34,7 @@ class SliderView implements ISliderView {
   private settings: sliderSettings;                      // настройки слайдера
   private inputs: NodeList | null = null;                // текстовые поля для значений слайдера с двумя бегунками
   private previousPos: number | null = null;             // позиция последнего смещенного ролика на шкале, px
-  private indexOfRoller: 0 | 1 | null = null;            // индекс ролика, на котором совершен клик
+  private indexOfRoller: 0 | 1 | null = null;                   // индекс ролика, на котором совершен клик
   private defaultSlider: HTMLInputElement | null = null; // стандартный слайдер
 
   constructor(container: HTMLElement, settings: sliderSettings) {
@@ -89,7 +93,6 @@ class SliderView implements ISliderView {
 
     // вычислим значение ролика и его номер
     if (position !== this.previousPos) {
-      // let indexOfRoller: 0 | 1;
       let inputValue: number;
       if (typeof value === "number") {
         this. indexOfRoller = descriptor;
@@ -146,8 +149,42 @@ class SliderView implements ISliderView {
     return this.container;
   }
 
+  public getScale(): HTMLElement {
+    return this.scale;
+  }
+
+  public getRange(): HTMLElement {
+    return this.range;
+  }
+
   public getSettings(): sliderSettings {
     return this.settings;
+  }
+
+  public findNearestRoller(e: PointerEvent): void {
+    if (!this.settings.range) {
+      this.indexOfRoller = 0;
+      return;
+    } else {
+      let posFirstRoller: number = this.getRollerPosition(0);
+      let posSecondRolller = this.getRollerPosition(1);
+      let posCursor: number;
+
+      if (this.settings.type = "horizontal") {
+        posCursor = e.clientX;
+      } else {
+        posCursor = e.clientY;
+      }
+
+      let isNearestFirstRoller: boolean =
+        Math.abs(posCursor - posFirstRoller) < Math.abs(posCursor - posSecondRolller);
+
+        if (isNearestFirstRoller){
+          this.indexOfRoller = 0;
+        } else {
+          this.indexOfRoller = 1;
+        }
+    }
   }
 
   private getRollerPosition(descriptor: number): number {
@@ -246,14 +283,13 @@ class SliderView implements ISliderView {
         inputValue = +(<HTMLInputElement>input).value;
         position  = this.calcPosition(inputValue);
         this.slide(position, <0 | 1>i);
-        this.paintRange();
       });
     } else {
       inputValue = +this.defaultSlider!.value;
       position = this.calcPosition(inputValue);
       this.slide(position, 0);
-      this.paintRange();
     }
+    this.paintRange();
   }
 
   // расчитывает смещение бегунка относительно шкалы

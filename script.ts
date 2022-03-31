@@ -1,17 +1,18 @@
 import Slider from "./Slider";
+import "./view/SliderView.scss";
 
 
 let h: Slider = new Slider("h", {
   min: 0,
   max: 100,
-  step: 55,
+  step: 1,
 });
 
 let hr: Slider = new Slider("hr", {
   range: true,
   min: 0,
   max: 100,
-  step: 110,
+  step: 1,
   values: [0, 60],
 });
 

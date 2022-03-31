@@ -55,8 +55,27 @@ class SliderController implements ISliderController {
   private handleContainerPointerdown(e: PointerEvent): void {
     // добавим обработчик на событие pointermove если оно произошло на бегунке
     let target: HTMLElement = e.target as HTMLElement;
-    if (this.isRoller(target)) {
+    let scale: HTMLElement = this.view.getScale();
+    let range: HTMLElement = this.view.getRange();
+
+
+    if (this.isRoller(target) || target === scale) {
       document.addEventListener("pointermove", this.handleDocumentPointermove);
+    }
+
+    if (target === scale || target === range) {
+      // найдём ближаший ролик от позиции клика
+      this.view.findNearestRoller(e);
+      let props: { value: number, descriptor: number } | null = this.view.setValue(e);
+
+      // если бегунок перемещен обновим модель
+      if (props) {
+        let { value, descriptor } = props;
+        this.slider.setValue(value, descriptor);
+      }
+    }
+
+    if (this.isRoller(target) ) {
       this.currentRoller = target;
       this.view.takeRoller(target);
     }
@@ -64,7 +83,9 @@ class SliderController implements ISliderController {
 
   private handleDocumentPointermove(e: PointerEvent): void {
     // обновим view
-    let props = this.view.setValue(e);
+    let props: { value: number, descriptor: number } | null = this.view.setValue(e);
+    console.log(props)
+
 
     // если бегунок перемещен обновим модель
     if (props) {
@@ -74,14 +95,15 @@ class SliderController implements ISliderController {
   }
 
   private handleContainerPointerup(e: PointerEvent): void {
-    // удалим обработчик на событие pointermove есди оно произашло на бегунке
+    // удалим обработчик на событие pointermove
     document.removeEventListener("pointermove", this.handleDocumentPointermove);
     this.view.throwRoller(this.currentRoller!);
   }
 
   private isRoller(target: HTMLElement): boolean {
-    let isFirstRoller = target.className === this.classesOfRollers[0];
-    let isSecondRoller = target.className === this.classesOfRollers[1];
+    let isFirstRoller = target === this.view.getRollers()[0];
+    let isSecondRoller = target === this.view.getRollers()[1];
+
     return isFirstRoller || isSecondRoller;
   }
 }
