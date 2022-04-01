@@ -59,11 +59,12 @@ class SliderController implements ISliderController {
     let range: HTMLElement = this.view.getRange();
 
 
-    if (this.isRoller(target) || target === scale) {
+    if (this.isRoller(target) || target === scale || target === range) {
       document.addEventListener("pointermove", this.handleDocumentPointermove);
     }
 
     if (target === scale || target === range) {
+      this.currentRoller = target;
       // найдём ближаший ролик от позиции клика
       this.view.findNearestRoller(e);
       let props: { value: number, descriptor: number } | null = this.view.setValue(e);
@@ -84,7 +85,6 @@ class SliderController implements ISliderController {
   private handleDocumentPointermove(e: PointerEvent): void {
     // обновим view
     let props: { value: number, descriptor: number } | null = this.view.setValue(e);
-    console.log(props)
 
 
     // если бегунок перемещен обновим модель

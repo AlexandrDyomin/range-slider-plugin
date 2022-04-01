@@ -170,20 +170,22 @@ class SliderView implements ISliderView {
       let posSecondRolller = this.getRollerPosition(1);
       let posCursor: number;
 
-      if (this.settings.type = "horizontal") {
-        posCursor = e.clientX;
+      if (this.settings.type === "horizontal") {
+        posCursor = e.clientX - this.offsetScale;
       } else {
-        posCursor = e.clientY;
+        posCursor = e.clientY - this.offsetScale;
       }
 
       let isNearestFirstRoller: boolean =
         Math.abs(posCursor - posFirstRoller) < Math.abs(posCursor - posSecondRolller);
 
-        if (isNearestFirstRoller){
-          this.indexOfRoller = 0;
-        } else {
-          this.indexOfRoller = 1;
-        }
+      if (isNearestFirstRoller){
+        this.indexOfRoller = 0;
+      } else {
+        this.indexOfRoller = 1;
+      }
+
+      this.calcLimits(this.rollers[this.indexOfRoller] as HTMLElement)
     }
   }
 
@@ -251,6 +253,8 @@ class SliderView implements ISliderView {
   }
 
   private slide(position: number, descriptor: 0 | 1): void {
+    // console.log(this.settings)
+
     // переместим бегунок
     if (this.settings.type === "horizontal") {
       (<HTMLElement>this.rollers[descriptor]).style.left = `${ position }px`;

@@ -28,7 +28,7 @@ let vr: Slider = new Slider("vr", {
   range: true,
   min: 0,
   max: 100,
-  step: 50,
+  step: 1,
   values: [1.5, 90.5],
   type: "vertical"
 });
