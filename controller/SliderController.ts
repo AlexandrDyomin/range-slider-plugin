@@ -11,7 +11,6 @@ interface ISliderController {
 class SliderController implements ISliderController {
   private view: ISliderView; // view слайдера
   private slider: ISliderModel; // модель слайдера
-  private classesOfRollers: [string, string?]; // классы бегунков
   private currentRoller: HTMLElement | null = null;
 
   constructor(view: ISliderView, slider: ISliderModel) {
@@ -26,14 +25,6 @@ class SliderController implements ISliderController {
     // добавим обработчики на события pointerdown, pointermove, pointerup
     this.view.getContainer().addEventListener("pointerdown", this.handleContainerPointerdown);
     document.addEventListener("pointerup", this.handleContainerPointerup);
-
-    // сохраним значения атрибута class бегунков в кортеж
-    this.view.getSettings().range ?
-      this.classesOfRollers = [
-        (<HTMLElement>this.view.getRollers()[0]).className,
-        (<HTMLElement>this.view.getRollers()[1]).className,
-      ] :
-      this.classesOfRollers = [(<HTMLElement>this.view.getRollers()[0]).className];
   }
 
   // возвращает значения бегунков
