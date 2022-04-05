@@ -1,4 +1,7 @@
 import type { sliderSettings } from "../Slider";
+import FormElements, { IFormElements } from "./FormElements";
+import Rollers, { IRollers } from "./Rollers";
+import Scale, { IScale } from "./Scale";
 import ATemplate from "./Template";
 
 
@@ -6,40 +9,28 @@ interface ISliderView {
   setValue(
     value: number | PointerEvent,
     descriptor?: 0 | 1
-  ): {value: number, descriptor: number} | null;
+  ): {value: number, descriptor: 0 | 1} | null;
+
 
   getRollers(): NodeList;
   getContainer(): HTMLElement;
   getSettings(): sliderSettings;
-  takeRoller(roller: HTMLElement): void;
+  takeRoller(roller: HTMLElement | PointerEvent): void;
   throwRoller(roller: HTMLElement): void;
   getScale(): HTMLElement;
   getRange(): HTMLElement;
-  findNearestRoller(e: PointerEvent): void;
 }
 
 
 class SliderView implements ISliderView {
-  private step: number;                                  // размер шага, px
   private minLimit: number;                              // минимально допустимое смещение бегунка,px
   private maxLimit: number;                              // максимально допустимое смещение бегунка, px
   private template: string;                              // html-код слайдера
-  private sizeScale: number;                             // ширина(высота) шкалы, px
-  private rollers: NodeList;                             // бегунки
-  private scale: HTMLElement;                            // шкала
-  private zeroOffset: number;                            // смещение нуля на шкале, px
-  private range: HTMLElement;                            // закрашиваемая часть шкалы
-  private sizeRoller: number;                            // ширина(высота) бегунка, px
-  private offsetScale: number;                           // смещение шкалы относительно окна, px
   private container: HTMLElement;                        // контейнер, в котором будет расположен слайдер
   private settings: sliderSettings;                      // настройки слайдера
-  private inputs: NodeList | null = null;                // текстовые поля для значений слайдера с двумя бегунками
-  private previousPos: number | null = null;             // позиция последнего смещенного ролика на шкале, px
-  private indexOfRoller: 0 | 1 | null = null;                   // индекс ролика, на котором совершен клик
-  private defaultSlider: HTMLInputElement | null = null; // стандартный слайдер
-
-
-
+  private inputs: IFormElements;
+  private rollers: IRollers;
+  private scale: IScale;
 
   constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;
@@ -48,32 +39,20 @@ class SliderView implements ISliderView {
 
     // отобразим слайдер на странице
     this.container.innerHTML = this.template;
+    this.inputs = new FormElements(this.container);
+    this.rollers = new Rollers(container, settings.type);
+    let scale = this.container.querySelector(".slider__scale") as HTMLElement;
+    let range = this.container.querySelector(".slider__range") as HTMLElement;
+    let rollerSize = this.rollers.getSize();
 
-    this.scale = this.container.querySelector(".slider__scale")!;
-    this.range = this.container.querySelector(".slider__range")!;
-    this.rollers = this.container.querySelectorAll(".slider__roller");
-    this.sizeRoller = this.getSizeElement(this.rollers[0] as HTMLElement);
-    this.sizeScale = this.getSizeElement(this.scale) - this.sizeRoller;
+    if (scale && range) {
+      this.scale = new Scale(settings, scale, range, rollerSize);
+    } else {
+      throw Error("Ошибка при создании экземпляра класса Scale");
+    }
+
     this.minLimit = 0;
-    this.maxLimit = this.sizeScale;
-    this.step = this.settings.step /
-                (this.settings.max - this.settings.min) * this.sizeScale;
-
-    this.zeroOffset = (this.settings.min - 0) /
-                (this.settings.max - this.settings.min) * this.sizeScale;
-
-    if (settings.type === "horizontal") {
-      this.offsetScale = this.scale.getBoundingClientRect().left;
-    } else {
-      this.offsetScale = this.scale.getBoundingClientRect().top;
-    }
-
-    if (this.settings.range) {
-      this.inputs = document.querySelectorAll(`#${ this.container.id } .slider > input`);
-    } else {
-
-      this.defaultSlider = document.querySelector(`#${ this.container.id } .slider > .slider-default_hidden`);
-    }
+    this.maxLimit = this.scale.getScaleSize();
 
     // добавим объекту window обработчик на событие resize
     this.handleDocumentResize = this.handleDocumentResize.bind(this);
@@ -90,55 +69,78 @@ class SliderView implements ISliderView {
   // передвигает бегунок и обновляет input
   public setValue(
     value: number | PointerEvent,
-    descriptor: 0 | 1 = 0
-  ): { value: number, descriptor: number } | null {
+    descriptor?: 0 | 1
+  ): { value: number, descriptor: 0 | 1 } | null {
     // вычислим смещение бегунка относительно шкалы
     let position: number = this.calcPosition(value);
 
     // вычислим значение ролика и его номер
-    if (position !== this.previousPos) {
+    if (position !== this.rollers.getLastUpdatedPosition()) {
       let inputValue: number;
-      if (typeof value === "number") {
-        this. indexOfRoller = descriptor;
+
+      if (typeof value === "number" && descriptor !== undefined) {
+        // переместим бегунок
+        this.rollers.slide(position, descriptor);
         inputValue = value;
       } else {
-        inputValue = this.calcValue(position);
+        inputValue = this.scale.calcValue(position);
+        descriptor = this.rollers.getDescriptor();
       }
 
       // переместим бегунок
-      this.slide(position, this.indexOfRoller!);
+      this.rollers.slide(position, descriptor);
 
       // обновим значение инпута
-      this.updateInput(inputValue, this.indexOfRoller!);
+      this.inputs.update(inputValue.toString(), descriptor);
 
       // закрасим диапазон
-      this.paintRange();
+      let { startPos, endPos } = this.calcStartEndPositionsOfRange();
+      this.scale.paint(startPos, endPos);
 
       return {
         value: inputValue,
-        descriptor: this.indexOfRoller!
+        descriptor: descriptor
       };
     } else {
       return null;
     }
   }
 
-  public takeRoller(roller: HTMLElement): void {
-    // сохраним индекс ролика
-    if (roller === this.rollers[0]) {
-      this.indexOfRoller = 0;
+  public takeRoller(roller: HTMLElement | PointerEvent): void {
+    if (roller instanceof HTMLElement) {
+      this.rollers.determineDescriptor(roller);
+
+      // вычислим максимально и минимально допустимые смещения для ролика
+      if (this.settings.range) {
+        this.calcLimits(roller);
+      }
+
+      return;
+    }
+
+    if (!this.settings.range) return;
+
+    let posFirstRoller: number = this.rollers.getPosition(0);
+    let posSecondRolller = this.rollers.getPosition(1);
+    let posCursor: number;
+
+    if (this.settings.type === "horizontal") {
+      posCursor = roller.clientX - this.scale.getScaleOffset();
     } else {
-      this. indexOfRoller = 1;
+      posCursor = roller.clientY - this.scale.getScaleOffset();
     }
 
-    // вычислим смещение ролика относительно окна
-    this.previousPos = this.getRollerPosition(this.indexOfRoller);
+    let isNearestFirstRoller: boolean =
+      Math.abs(posCursor - posFirstRoller) < Math.abs(posCursor - posSecondRolller);
 
-    // вычислим максимально и минимально допустимые смещения относительно шкалы для ролика
-    if (this.settings.range) {
-      this.calcLimits(roller);
+    if (isNearestFirstRoller){
+      this.rollers.setDescriptor(0);
+    } else {
+      this.rollers.setDescriptor(1);
     }
 
+    let descriptor = this.rollers.getDescriptor();
+    this.calcLimits(this.rollers.getRollers()[descriptor] as HTMLElement);
   }
 
   public throwRoller(roller: HTMLElement): void {
@@ -146,7 +148,7 @@ class SliderView implements ISliderView {
   }
 
   public getRollers(): NodeList {
-    return this.rollers;
+    return this.rollers.getRollers();
   }
 
   public getContainer(): HTMLElement {
@@ -154,150 +156,62 @@ class SliderView implements ISliderView {
   }
 
   public getScale(): HTMLElement {
-    return this.scale;
+    return this.scale.getScale();
   }
 
   public getRange(): HTMLElement {
-    return this.range;
+    return this.scale.getRange();
   }
 
   public getSettings(): sliderSettings {
     return this.settings;
   }
 
-  public findNearestRoller(e: PointerEvent): void {
-    if (!this.settings.range) {
-      this.indexOfRoller = 0;
-      return;
-    } else {
-      let posFirstRoller: number = this.getRollerPosition(0);
-      let posSecondRolller = this.getRollerPosition(1);
-      let posCursor: number;
-
-      if (this.settings.type === "horizontal") {
-        posCursor = e.clientX - this.offsetScale;
-      } else {
-        posCursor = e.clientY - this.offsetScale;
-      }
-
-      let isNearestFirstRoller: boolean =
-        Math.abs(posCursor - posFirstRoller) < Math.abs(posCursor - posSecondRolller);
-
-      if (isNearestFirstRoller){
-        this.indexOfRoller = 0;
-      } else {
-        this.indexOfRoller = 1;
-      }
-
-      this.calcLimits(this.rollers[this.indexOfRoller] as HTMLElement)
-    }
-  }
-
-  private getRollerPosition(descriptor: number): number {
-    let roller: HTMLElement = <HTMLElement>this.rollers[descriptor];
-    let position: number;
-
-    if (this.settings.type === "horizontal") {
-      position = +roller.style.left.replace("px", "");
-    } else {
-      position = +roller.style.top.replace("px", "");
-
-    }
-
-    return position;
-  }
-
   // вычисляет максимально и минимально допустимые смещения ролика
   private calcLimits(roller: HTMLElement): void {
     if (this.settings.type === "horizontal") {
-      if (roller === this.rollers[0]) {
+      if (roller === this.rollers.getRollers()[0]) {
         this.minLimit = 0;
-        this.maxLimit= this.getRollerPosition(1);
+        this.maxLimit= this.rollers.getPosition(1);
       }
 
-      if (roller === this.rollers[1]) {
-        this.minLimit = this.getRollerPosition(0);
-        this.maxLimit = this.sizeScale;
+      if (roller === this.rollers.getRollers()[1]) {
+        this.minLimit = this.rollers.getPosition(0);
+        this.maxLimit = this.scale.getScaleSize();
       }
     } else {
-      if (roller === this.rollers[0]) {
-        this.minLimit =this.getRollerPosition(1);
-        this.maxLimit = this.sizeScale;
+      if (roller === this.rollers.getRollers()[0]) {
+        this.minLimit =this.rollers.getPosition(1);
+        this.maxLimit = this.scale.getScaleSize();
       }
 
-      if (roller === this.rollers[1]) {
+      if (roller === this.rollers.getRollers()[1]) {
         this.minLimit = 0;
-        this.maxLimit = this.getRollerPosition(0);
+        this.maxLimit = this.rollers.getPosition(0);
       }
     }
-  }
-
-  private updateInput(value: number, descriptor: 0 | 1): void {
-    if (this.settings.range) {
-      (<HTMLInputElement>this.inputs![descriptor]).value = value.toString();
-    } else {
-      this.defaultSlider!.value = value.toString();
-    }
-  }
-
-  // вычисляет значение бегунка
-  private calcValue(position: number): number {
-    // вычислим значение ролика
-    let value: number = position / this.sizeScale;
-    value = value * (this.settings.max - this.settings.min);
-
-    let offset = this.settings.min - 0;
-    value += offset;
-
-    if (this.settings.type === "vertical") {
-      value = this.settings.max - value + offset;
-    }
-
-    return value;
-  }
-
-  private slide(position: number, descriptor: 0 | 1): void {
-    // console.log(this.settings)
-
-    // переместим бегунок
-    if (this.settings.type === "horizontal") {
-      (<HTMLElement>this.rollers[descriptor]).style.left = `${ position }px`;
-    } else {
-      (<HTMLElement>this.rollers[descriptor]).style.top = `${ position }px`;
-    }
-
-    this.previousPos = position;
-  }
-
-  private getSizeElement(element: HTMLElement): number {
-    if (this.settings.type === "vertical") {
-      return element.offsetHeight;
-    }
-
-    return element.offsetWidth;
   }
 
   private handleDocumentResize(): void {
-    // пересчитаем поля
-    this.sizeScale = this.getSizeElement(this.scale) - this.sizeRoller;
-    this.step = this.settings.step /
-                (this.settings.max - this.settings.min) * this.sizeScale;
+    // пересчитаем размеры шкалы
+    this.scale.calcSizes();
+
+    if (!this.settings.range) {
+      this.maxLimit = this.scale.getScaleSize();
+    }
 
     // обновим позиции бегунков
     let inputValue: number;
     let position: number;
-    if (this.settings.range) {
-      this.inputs!.forEach( (input, i) => {
-        inputValue = +(<HTMLInputElement>input).value;
-        position  = this.calcPosition(inputValue);
-        this.slide(position, <0 | 1>i);
-      });
-    } else {
-      inputValue = +this.defaultSlider!.value;
-      position = this.calcPosition(inputValue);
-      this.slide(position, 0);
-    }
-    this.paintRange();
+
+    this.inputs.getInputs().forEach( (input, i) => {
+      inputValue = +(<HTMLInputElement>input).value;
+      position  = this.calcPosition(inputValue);
+      this.rollers.slide(position, <0 | 1>i);
+    });
+
+    let { startPos, endPos } = this.calcStartEndPositionsOfRange();
+    this.scale.paint(startPos, endPos);
   }
 
   // расчитывает смещение бегунка относительно шкалы
@@ -308,23 +222,23 @@ class SliderView implements ISliderView {
     if (typeof value === "number") {
 
       position = value / (this.settings.max - this.settings.min);
-      position *= this.sizeScale;
-      position -= this.zeroOffset;
+      position *= this.scale.getScaleSize();
+      position -= this.scale.getZeroOffset();
 
       if (this.settings.type ==="vertical") {
-        position = this.sizeScale - position
+        position = this.scale.getScaleSize() - position
       }
 
       return position;
     }
 
     if (this.settings.type === "vertical") {
-      position = value.clientY - this.offsetScale;
+      position = value.clientY - this.scale.getScaleOffset();
     } else {
-      position = value.clientX - this.offsetScale;
+      position = value.clientX - this.scale.getScaleOffset();
     }
 
-    position -= this.sizeRoller/2;
+    position -= this.rollers.getSize()/2;
 
     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     let validValue = this.getNearestValidValue(position);
@@ -333,7 +247,7 @@ class SliderView implements ISliderView {
     // вычислим на какое количество шагов необходимо сдвинуть бегунок
     let steps = this.calcCountSteps(position);
 
-    position = this.previousPos! + steps * this.step;
+    position = this.rollers.getLastUpdatedPosition()! + steps * this.scale.getStep();
 
     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     validValue = this.getNearestValidValue(position);
@@ -356,36 +270,33 @@ class SliderView implements ISliderView {
 
   private calcCountSteps(position: number): number {
     // вычислим смещение курсора в пикселях
-    let offset: number = position - this.previousPos!;
+    let offset: number = position - this.rollers.getLastUpdatedPosition()!;
 
     // вычислим на какое количество шагов необходимо сдвинуть бегунок
-    let steps: number = Math.round(offset / this.step);
+    let steps: number = Math.round(offset / this.scale.getStep() );
     return steps;
   }
 
-  private paintRange(): void {
-    let start: number;
-    let end: number;
+  private calcStartEndPositionsOfRange(): { startPos: number, endPos: number } {
+    let startPos: number;
+    let endPos: number;
     if (this.settings.range) {
-      start = this.getRollerPosition(0);
-      end = this.getRollerPosition(1);
+      startPos = this.rollers.getPosition(0);
+      endPos = this.rollers.getPosition(1);
     } else {
-      start = 0;
-      end = this.getRollerPosition(0);
+      startPos = 0;
+      endPos = this.rollers.getPosition(0);
     }
 
     if (this.settings.type === "horizontal"){
-      end = this.sizeScale - end;
-      this.range.style.left = `${ start }px`;
-      this.range.style.right = `${ end }px`;
+      endPos = this.scale.getScaleSize() - endPos;
     } else {
       if (this.settings.range) {
-        start = this.sizeScale - start;
+        startPos = this.scale.getScaleSize() - startPos;
       }
-
-      this.range.style.bottom = `${ start }px`;
-      this.range.style.top = `${ end }px`;
     }
+
+    return { startPos, endPos };
   }
 }
 

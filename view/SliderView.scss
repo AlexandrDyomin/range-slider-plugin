@@ -1,3 +1,5 @@
+$color: #C70039 ;
+
 .slider,
 .slider__scale,
 .slider__range,
@@ -46,7 +48,7 @@ input[type="range"].slider-default_hidden {
 
 //  закрашиваемый диапазон
 .slider__range {
-  background-color: #00b4eb;
+  background-color:  $color ;
   position: absolute;
 }
 
@@ -71,9 +73,8 @@ input[type="range"].slider-default_hidden {
   position: absolute;
 
   border-radius: 50%;
-  box-shadow: inset 0 0 3px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 3px 3px rgba(0, 0, 0, 0.45);
   background-color: #eee;
-
   cursor: pointer;
 
   &::after {
@@ -86,7 +87,7 @@ input[type="range"].slider-default_hidden {
     left: 12px;
 
     transform: translate(-50%, -50%);
-    background-color: #00b4eb;
+    background-color:  $color;
     border-radius: 50%;
     box-shadow: inset 0 0 3px 1px rgba(0, 0, 0, 0.3);
   }
