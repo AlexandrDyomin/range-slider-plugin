@@ -19,14 +19,15 @@ type sacleSettings = {
 
 
 class Scale implements IScale {
-  private settings: sliderSettings;
-  private scale: HTMLElement; // шкала
-  private range: HTMLElement; // закрашиваемая часть шкалы
+  private step: number;                  // размер шага, px
+  private scaleSize: number;             // ширина(высота) шкалы, px
+  private scale: HTMLElement;
+  private range: HTMLElement;            // закрашиваемая часть шкалы
   private rollerSize: number;
-  private scaleSize: number;  // ширина(высота) шкалы, px
-  private zeroOffset: number; // смещение нуля на шкале, px
-  private scaleOffset: number; // смещение шкалы относительно окна, px
-  private step: number;     // размер шага, px
+  private zeroOffset: number;            // смещение нуля на шкале, px
+  private scaleOffset: number;           // смещение шкалы относительно окна, px
+  private settings: sliderSettings;
+  private numberOfDecimalPlaces: number; // максимальное количество знаков, отображаемых после запятой
 
   constructor(
     scale: HTMLElement,
@@ -42,6 +43,7 @@ class Scale implements IScale {
     this.zeroOffset = this.caclZeroOffset();
     this.scaleOffset = this.calcScaleOffset();
     this.step = this.calcStep();
+    this.numberOfDecimalPlaces = this.countDecimalPlaces(settings.step);
   }
 
   public paint(startPos: number, endPos: number): void {
@@ -66,7 +68,7 @@ class Scale implements IScale {
       value = this.settings.max - value + offset;
     }
 
-    return value;
+    return this.roundValue(value);
  }
 
   public calcSizes(): void {
@@ -115,6 +117,17 @@ class Scale implements IScale {
     }
 
     return this.scale.offsetWidth - this.rollerSize;
+  }
+
+  private countDecimalPlaces(value: number): number {
+    let integerAndDecimal: string[] = value.toString().split(".");
+    if (integerAndDecimal.length === 1) return 1;
+    return value.toString().split(".")[1].length;
+  }
+
+  private roundValue(value: number): number {
+    let x = Math.pow(10, this.numberOfDecimalPlaces);
+    return Math.round(value * x) /x;
   }
 }
 

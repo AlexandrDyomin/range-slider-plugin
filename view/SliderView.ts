@@ -23,12 +23,12 @@ interface ISliderView {
 class SliderView implements ISliderView {
   private scale: IScale;
   // private output: IOutput;
-  private minLimit: number;                              // минимально допустимое смещение бегунка,px
-  private maxLimit: number;                              // максимально допустимое смещение бегунка, px
+  private minLimit: number; // минимально допустимое смещение бегунка,px
+  private maxLimit: number; // максимально допустимое смещение бегунка, px
   private rollers: IRollers;
   private template: ITemplate;
   private inputs: IFormElements;
-  private settings: sliderSettings;                      // настройки слайдера
+  private settings: sliderSettings;
 
   constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;

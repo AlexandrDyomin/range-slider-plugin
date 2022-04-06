@@ -3,16 +3,18 @@ import "./view/SliderView.scss";
 
 
 let h: Slider = new Slider("h", {
-  min: 0,
+  min: -50,
   max: 100,
-  step: 1,
 });
 
 let hr: Slider = new Slider("hr", {
   range: true,
-  step: 1,
-  values: [20, 30]
+  step: 0.5,
+  min: -50,
+  max: 50,
 });
+
+console.loghr.getValue();
 
 let v: Slider = new Slider("v", {
   min: 0,

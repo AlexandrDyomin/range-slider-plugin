@@ -8,15 +8,26 @@ $color: #C70039 ;
   box-sizing: border-box;
 }
 
-// дефолтный слайдер
+.slider {
+  padding: 10px;
+}
+
+// инпуты
 .slider >
-input[type="range"].slider-default_hidden {
+input {
   width: 0;
   height: 0;
   clip: rect(0, 0, 0, 0);
   overflow: hidden;
   position: absolute;
   opacity: 0;
+}
+
+.slider__display {
+  display: block;
+  margin: 0 auto;
+  width: min-content;
+  margin-bottom: 20px;
 }
 
 
