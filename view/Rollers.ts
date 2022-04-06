@@ -1,29 +1,48 @@
 interface IRollers {
-  getRollers(): NodeList;
-  getPosition(descriptor: number): number;
-  getDescriptor(): 0 | 1
-  getLastUpdatedPosition(): number;
-  setDescriptor(descriptor: 0 | 1): void;
-  getSize(): number;
-  determineDescriptor(roller: HTMLElement): void;
   slide(position: number, descriptor: 0 | 1): void;
+  setDescriptor(descriptor: 0 | 1): void;
+  determineDescriptor(roller: HTMLElement): void;
+  getSize(): number;
+  getDescriptor(): 0 | 1;
+  getLastUpdatedPosition(): number;
+  getPosition(descriptor: number): number;
 }
 
 
 class Rollers implements IRollers {
   private rollers: NodeList; // бегунки
-  private type: "horizontal" | "vertical"; // тип слайдера
+  private directionOfSlide: "horizontal" | "vertical"; // тип слайдера
   private descriptor: 0 | 1 = 0;
   private size: number;
 
-  constructor(container: HTMLElement, type: "horizontal" | "vertical") {
-    this.rollers = container.querySelectorAll(".slider__roller");
-    this.type = type;
+  constructor(
+    rollers: NodeList,
+    directionOfSlide: "horizontal" | "vertical"
+    ) {
+    this.rollers = rollers;
+    this.directionOfSlide = directionOfSlide;
     this.size = (<HTMLElement>this.rollers[0] ).offsetWidth;
   }
 
-  public getRollers(): NodeList {
-    return this.rollers;
+  public determineDescriptor(roller: HTMLElement): void {
+    if (roller === this.rollers[0]) {
+      this.descriptor = 0;
+    } else {
+      this. descriptor = 1;
+    }
+  }
+
+  public setDescriptor(descriptor: 0 | 1): void {
+    this.descriptor = descriptor;
+  }
+
+  public slide(position: number, descriptor: 0 | 1): void {
+    // переместим бегунок
+    if (this.directionOfSlide === "horizontal") {
+      (<HTMLElement>this.rollers[descriptor]).style.left = `${ position }px`;
+    } else {
+      (<HTMLElement>this.rollers[descriptor]).style.top = `${ position }px`;
+    }
   }
 
   public getSize(): number {
@@ -42,7 +61,7 @@ class Rollers implements IRollers {
     let roller: HTMLElement = <HTMLElement>this.rollers[descriptor];
     let position: number;
 
-    if (this.type === "horizontal") {
+    if (this.directionOfSlide === "horizontal") {
       position = +roller.style.left.replace("px", "");
     } else {
       position = +roller.style.top.replace("px", "");
@@ -51,26 +70,6 @@ class Rollers implements IRollers {
     return position;
   }
 
-  public determineDescriptor(roller: HTMLElement): void {
-    if (roller === this.rollers[0]) {
-      this.descriptor = 0;
-    } else {
-      this. descriptor = 1;
-    }
-  }
-
-  public setDescriptor(descriptor: 0 | 1): void {
-    this.descriptor = descriptor;
-  }
-
-  public slide(position: number, descriptor: 0 | 1): void {
-     // переместим бегунок
-     if (this.type === "horizontal") {
-      (<HTMLElement>this.rollers[descriptor]).style.left = `${ position }px`;
-    } else {
-      (<HTMLElement>this.rollers[descriptor]).style.top = `${ position }px`;
-    }
-  }
 }
 
 

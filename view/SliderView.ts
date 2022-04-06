@@ -2,19 +2,17 @@ import type { sliderSettings } from "../Slider";
 import FormElements, { IFormElements } from "./FormElements";
 import Rollers, { IRollers } from "./Rollers";
 import Scale, { IScale } from "./Scale";
-import ATemplate from "./Template";
+import Template, { ITemplate } from "./Template";
 
 
 interface ISliderView {
-  setValue(
+  update(
     value: number | PointerEvent,
     descriptor?: 0 | 1
   ): {value: number, descriptor: 0 | 1} | null;
-
-
   getRollers(): NodeList;
-  getContainer(): HTMLElement;
-  getSettings(): sliderSettings;
+  getSlider(): HTMLElement;
+  // getSettings(): sliderSettings;
   takeRoller(roller: HTMLElement | PointerEvent): void;
   throwRoller(roller: HTMLElement): void;
   getScale(): HTMLElement;
@@ -23,34 +21,26 @@ interface ISliderView {
 
 
 class SliderView implements ISliderView {
+  private scale: IScale;
+  // private output: IOutput;
   private minLimit: number;                              // минимально допустимое смещение бегунка,px
   private maxLimit: number;                              // максимально допустимое смещение бегунка, px
-  private template: string;                              // html-код слайдера
-  private container: HTMLElement;                        // контейнер, в котором будет расположен слайдер
-  private settings: sliderSettings;                      // настройки слайдера
-  private inputs: IFormElements;
   private rollers: IRollers;
-  private scale: IScale;
+  private template: ITemplate;
+  private inputs: IFormElements;
+  private settings: sliderSettings;                      // настройки слайдера
 
   constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;
-    this.container = container;
-    this.template = ATemplate.getTemplate(settings);
-
-    // отобразим слайдер на странице
-    this.container.innerHTML = this.template;
-    this.inputs = new FormElements(this.container);
-    this.rollers = new Rollers(container, settings.type);
-    let scale = this.container.querySelector(".slider__scale") as HTMLElement;
-    let range = this.container.querySelector(".slider__range") as HTMLElement;
-    let rollerSize = this.rollers.getSize();
-
-    if (scale && range) {
-      this.scale = new Scale(settings, scale, range, rollerSize);
-    } else {
-      throw Error("Ошибка при создании экземпляра класса Scale");
-    }
-
+    this.template = new Template(container, settings);
+    this.inputs = new FormElements(this.template.getInputs() );
+    this.rollers = new Rollers(this.template.getRollers(), settings.type);
+    this.scale = new Scale(
+      this.template.getScale(),
+      this.template.getRange(),
+      this.rollers.getSize(),
+      settings
+    );
     this.minLimit = 0;
     this.maxLimit = this.scale.getScaleSize();
 
@@ -59,15 +49,10 @@ class SliderView implements ISliderView {
     window.addEventListener("resize", this.handleDocumentResize);
 
     // обновим положение бегунков в соответствие с переданными настройками
-    if (this.settings.range) {
-      this.settings.values!.forEach( (value, i) => this.setValue(value, <0 | 1>i) );
-    } else {
-      this.setValue(this.settings.value!, 0);
-    }
+    this.settings.values.forEach( (value, i) => this.update(value, <0 | 1>i) );
   }
 
-  // передвигает бегунок и обновляет input
-  public setValue(
+  public update(
     value: number | PointerEvent,
     descriptor?: 0 | 1
   ): { value: number, descriptor: 0 | 1 } | null {
@@ -75,7 +60,7 @@ class SliderView implements ISliderView {
     let position: number = this.calcPosition(value);
 
     // вычислим значение ролика и его номер
-    if (position !== this.rollers.getLastUpdatedPosition()) {
+    if (position !== this.rollers.getLastUpdatedPosition() ) {
       let inputValue: number;
 
       if (typeof value === "number" && descriptor !== undefined) {
@@ -140,7 +125,7 @@ class SliderView implements ISliderView {
     }
 
     let descriptor = this.rollers.getDescriptor();
-    this.calcLimits(this.rollers.getRollers()[descriptor] as HTMLElement);
+    this.calcLimits(this.template.getRollers()[descriptor] as HTMLElement);
   }
 
   public throwRoller(roller: HTMLElement): void {
@@ -148,44 +133,44 @@ class SliderView implements ISliderView {
   }
 
   public getRollers(): NodeList {
-    return this.rollers.getRollers();
+    return this.template.getRollers();
   }
 
-  public getContainer(): HTMLElement {
-    return this.container;
+  public getSlider(): HTMLElement {
+    return this.template.getSlider();
   }
 
   public getScale(): HTMLElement {
-    return this.scale.getScale();
+    return this.template.getScale();
   }
 
   public getRange(): HTMLElement {
-    return this.scale.getRange();
+    return this.template.getRange();
   }
 
-  public getSettings(): sliderSettings {
-    return this.settings;
-  }
+  // public getSettings(): sliderSettings {
+  //   return this.settings;
+  // }
 
   // вычисляет максимально и минимально допустимые смещения ролика
   private calcLimits(roller: HTMLElement): void {
     if (this.settings.type === "horizontal") {
-      if (roller === this.rollers.getRollers()[0]) {
+      if (roller === this.template.getRollers()[0]) {
         this.minLimit = 0;
         this.maxLimit= this.rollers.getPosition(1);
       }
 
-      if (roller === this.rollers.getRollers()[1]) {
+      if (roller === this.template.getRollers()[1]) {
         this.minLimit = this.rollers.getPosition(0);
         this.maxLimit = this.scale.getScaleSize();
       }
     } else {
-      if (roller === this.rollers.getRollers()[0]) {
+      if (roller === this.template.getRollers()[0]) {
         this.minLimit =this.rollers.getPosition(1);
         this.maxLimit = this.scale.getScaleSize();
       }
 
-      if (roller === this.rollers.getRollers()[1]) {
+      if (roller === this.template.getRollers()[1]) {
         this.minLimit = 0;
         this.maxLimit = this.rollers.getPosition(0);
       }
@@ -216,7 +201,6 @@ class SliderView implements ISliderView {
 
   // расчитывает смещение бегунка относительно шкалы
   private calcPosition(value: number | PointerEvent): number {
-    // вычислим смещение бегунка относительно шкалы
     let position: number;
 
     if (typeof value === "number") {
@@ -247,7 +231,7 @@ class SliderView implements ISliderView {
     // вычислим на какое количество шагов необходимо сдвинуть бегунок
     let steps = this.calcCountSteps(position);
 
-    position = this.rollers.getLastUpdatedPosition()! + steps * this.scale.getStep();
+    position = this.rollers.getLastUpdatedPosition() + steps * this.scale.getStep();
 
     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     validValue = this.getNearestValidValue(position);
@@ -270,13 +254,14 @@ class SliderView implements ISliderView {
 
   private calcCountSteps(position: number): number {
     // вычислим смещение курсора в пикселях
-    let offset: number = position - this.rollers.getLastUpdatedPosition()!;
+    let offset: number = position - this.rollers.getLastUpdatedPosition();
 
     // вычислим на какое количество шагов необходимо сдвинуть бегунок
     let steps: number = Math.round(offset / this.scale.getStep() );
     return steps;
   }
 
+  // возвращает позиции начала и конца закрашиваемого диапазона
   private calcStartEndPositionsOfRange(): { startPos: number, endPos: number } {
     let startPos: number;
     let endPos: number;

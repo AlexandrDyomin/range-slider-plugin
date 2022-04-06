@@ -23,7 +23,7 @@ class SliderController implements ISliderController {
     this.handleContainerPointerup = this.handleContainerPointerup.bind(this);
 
     // добавим обработчики на события pointerdown, pointermove, pointerup
-    this.view.getContainer().addEventListener("pointerdown", this.handleContainerPointerdown);
+    this.view.getSlider().addEventListener("pointerdown", this.handleContainerPointerdown);
     document.addEventListener("pointerup", this.handleContainerPointerup);
   }
 
@@ -36,7 +36,7 @@ class SliderController implements ISliderController {
   public setValue(value: number, descriptor: 0 | 1 = 0): void {
     try {
       this.slider.setValue(value, descriptor);
-      this.view.setValue(value, descriptor);
+      this.view.update(value, descriptor);
     } catch(e) {
         console.error(e);
     }
@@ -58,7 +58,7 @@ class SliderController implements ISliderController {
       this.currentRoller = target;
       // найдём ближаший ролик от позиции клика
       this.view.takeRoller(e);
-      let props: { value: number, descriptor: number } | null = this.view.setValue(e);
+      let props: { value: number, descriptor: number } | null = this.view.update(e);
 
       // если бегунок перемещен обновим модель
       if (props) {
@@ -75,7 +75,7 @@ class SliderController implements ISliderController {
 
   private handleDocumentPointermove(e: PointerEvent): void {
     // обновим view
-    let props: { value: number, descriptor: number } | null = this.view.setValue(e);
+    let props: { value: number, descriptor: number } | null = this.view.update(e);
 
     // если бегунок перемещен обновим модель
     if (props) {

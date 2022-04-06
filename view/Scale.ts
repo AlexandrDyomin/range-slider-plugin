@@ -4,12 +4,17 @@ interface IScale {
   paint(startPos: number, endPos: number): void;
   calcValue(position: number): number;
   calcSizes(): void;
-  getScale(): HTMLElement;
-  getRange(): HTMLElement;
   getScaleOffset(): number;
   getZeroOffset(): number;
   getStep(): number;
   getScaleSize(): number;
+}
+
+
+type sacleSettings = {
+  min: number,
+  max: number,
+  type: "vertical" | "horizontal"
 }
 
 
@@ -24,10 +29,10 @@ class Scale implements IScale {
   private step: number;     // размер шага, px
 
   constructor(
-    settings: sliderSettings,
     scale: HTMLElement,
     range: HTMLElement,
-    rollerSize: number
+    rollerSize: number,
+    settings: sliderSettings
   ) {
     this.settings = settings;
     this.scale = scale;
@@ -37,30 +42,6 @@ class Scale implements IScale {
     this.zeroOffset = this.caclZeroOffset();
     this.scaleOffset = this.calcScaleOffset();
     this.step = this.calcStep();
-  }
-
-  public getScaleOffset(): number {
-    return this.scaleOffset;
-  }
-
-  public getScale(): HTMLElement {
-    return this.scale;
-  }
-
-  public getZeroOffset(): number {
-    return this.zeroOffset;
-  }
-
-  public getRange(): HTMLElement {
-    return this.range;
-  }
-
-  public getStep(): number {
-    return this.step;
-  }
-
-  public getScaleSize(): number {
-    return this.scaleSize;
   }
 
   public paint(startPos: number, endPos: number): void {
@@ -74,24 +55,40 @@ class Scale implements IScale {
   }
 
   public calcValue(position: number): number {
-     // вычислим значение ролика
-     let value: number = position / this.scaleSize;
-     value = value * (this.settings.max - this.settings.min);
+    // вычислим значение ролика
+    let value: number = position / this.scaleSize;
+    value = value * (this.settings.max - this.settings.min);
 
-     let offset = this.settings.min - 0;
-     value += offset;
+    let offset = this.settings.min - 0;
+    value += offset;
 
-     if (this.settings.type === "vertical") {
-       value = this.settings.max - value + offset;
-     }
+    if (this.settings.type === "vertical") {
+      value = this.settings.max - value + offset;
+    }
 
-     return value;
-  }
+    return value;
+ }
 
   public calcSizes(): void {
     this.scaleSize = this.calcScaleSize();
     this.zeroOffset = this.caclZeroOffset();
     this.scaleOffset = this.calcScaleOffset();
+  }
+
+  public getScaleOffset(): number {
+    return this.scaleOffset;
+  }
+
+  public getZeroOffset(): number {
+    return this.zeroOffset;
+  }
+
+  public getStep(): number {
+    return this.step;
+  }
+
+  public getScaleSize(): number {
+    return this.scaleSize;
   }
 
   private calcStep(): number {
@@ -122,5 +119,5 @@ class Scale implements IScale {
 }
 
 
-export type { IScale };
+export type { IScale, sacleSettings };
 export default Scale;

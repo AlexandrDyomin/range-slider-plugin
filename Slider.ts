@@ -13,8 +13,7 @@ type sliderSettings = {
   step: number,
   type: "horizontal" | "vertical",
   range: boolean,
-  value?: number,
-  values?:[number, number],
+  values:[number, number] | [number],
   // create(event: Event, ui: SliderController): void,
   // start(event: Event, ui: SliderController): void,
   // slide(event: Event, ui: SliderController): void,
@@ -33,12 +32,14 @@ class Slider implements ISliderController {
       step: 1,
       type: "horizontal",
       range: false,
+      values: [50]
       // create(event: Event, ui: SliderController): void{},
       // start(event: Event, ui: SliderController): void{},
       // slide(event: Event, ui: SliderController): void{},
       // stop(event: Event, ui: SliderController): void{},
       // change(event: Event, ui: SliderController): void{}
     };
+
     let settings: sliderSettings;
 
     // объединим дефолтные настройки с пользовательскими
@@ -52,19 +53,19 @@ class Slider implements ISliderController {
     }
 
     // зададим значения слайдера
-    if (settings.range && !settings.values) {
+    if (settings.range && settings.values.length === 1) {
       settings.values = [settings.min, settings.max];
     }
 
-    if (!settings.range && settings.value === undefined){
-      settings.value = settings.max / 2  + ( (settings.min - 0) / 2);
+    if (!settings.range && settings.values.length === 1){
+      settings.values = [settings.max / 2  + ( (settings.min - 0) / 2)];
     }
 
     // если слайдер с диапазоном создадим два бегунка, иначе один
     let rollers: [Roller, Roller?];
-    settings.range ?
-      rollers = [new Roller(settings.values![0]), new Roller(settings.values![1]) ] :
-      rollers = [new Roller(settings.value!)];
+    settings.range && settings.values.length === 2 ?
+      rollers = [new Roller(settings.values[0]), new Roller(settings.values[1]) ] :
+      rollers = [new Roller(settings.values[0])];
 
     // создадим шкалу
     let scale: Scale = new Scale(settings.max, settings.min, settings.step);

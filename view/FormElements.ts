@@ -7,8 +7,8 @@ interface IFormElements {
 class FormElements implements IFormElements {
   private inputs: NodeList; // контейнер для инпутов
 
-  constructor(container: HTMLElement) {
-    this.inputs = document.querySelectorAll(`#${ container.id } .slider > input`);
+  constructor(inputs: NodeList) {
+    this.inputs = inputs;
   }
 
   public update(value: string, descriptor: 0 | 1 = 0): void {

@@ -10,12 +10,9 @@ let h: Slider = new Slider("h", {
 
 let hr: Slider = new Slider("hr", {
   range: true,
-  min: 0,
-  max: 100,
   step: 1,
-  values: [0, 60],
+  values: [20, 30]
 });
-
 
 let v: Slider = new Slider("v", {
   min: 0,
