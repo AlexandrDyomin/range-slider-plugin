@@ -14,8 +14,6 @@ let hr: Slider = new Slider("hr", {
   max: 50,
 });
 
-console.loghr.getValue();
-
 let v: Slider = new Slider("v", {
   min: 0,
   max: 100,
