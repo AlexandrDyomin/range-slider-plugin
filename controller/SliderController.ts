@@ -45,31 +45,33 @@ class SliderController implements ISliderController {
   // обработчики событий указателя
   private handleContainerPointerdown(e: PointerEvent): void {
     // добавим обработчик на событие pointermove если оно произошло на бегунке
-    let target: HTMLElement = e.target as HTMLElement;
-    let scale: HTMLElement = this.view.getScale();
-    let range: HTMLElement = this.view.getRange();
+    if (e.button === 0 ) {
+      let target: HTMLElement = e.target as HTMLElement;
+      let scale: HTMLElement = this.view.getScale();
+      let range: HTMLElement = this.view.getRange();
 
 
-    if (this.isRoller(target) || target === scale || target === range) {
-      document.addEventListener("pointermove", this.handleDocumentPointermove);
-    }
-
-    if (target === scale || target === range) {
-      this.currentRoller = target;
-      // найдём ближаший ролик от позиции клика
-      this.view.takeRoller(e);
-      let props: { value: number, descriptor: number } | null = this.view.update(e);
-
-      // если бегунок перемещен обновим модель
-      if (props) {
-        let { value, descriptor } = props;
-        this.slider.setValue(value, descriptor);
+      if (this.isRoller(target) || target === scale || target === range) {
+        document.addEventListener("pointermove", this.handleDocumentPointermove);
       }
-    }
 
-    if (this.isRoller(target) ) {
-      this.currentRoller = target;
-      this.view.takeRoller(target);
+      if (target === scale || target === range) {
+        this.currentRoller = target;
+        // найдём ближаший ролик от позиции клика
+        this.view.takeRoller(e);
+        let props: { value: number, descriptor: number } | null = this.view.update(e);
+
+        // если бегунок перемещен обновим модель
+        if (props) {
+          let { value, descriptor } = props;
+          this.slider.setValue(value, descriptor);
+        }
+      }
+
+      if (this.isRoller(target) ) {
+        this.currentRoller = target;
+        this.view.takeRoller(target);
+      }
     }
   }
 

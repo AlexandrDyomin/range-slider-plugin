@@ -9,7 +9,7 @@ $color: #C70039 ;
 }
 
 .slider {
-  padding: 10px;
+  user-select: none;
 }
 
 // инпуты
@@ -21,13 +21,6 @@ input {
   overflow: hidden;
   position: absolute;
   opacity: 0;
-}
-
-.slider__display {
-  display: block;
-  margin: 0 auto;
-  width: min-content;
-  margin-bottom: 20px;
 }
 
 
@@ -120,3 +113,24 @@ input {
   left: -4px;
 }
 
+// output
+.slider__display {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  padding: 0 7px;
+  background:linear-gradient(90deg, #ea9fb4, #C70039);
+  margin-bottom: 5px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+}
+
+.slider__scale_vertical .slider__display {
+  bottom: 50%;
+  left: 100%;
+  transform: translateY(50%);
+  margin: 0 0 0 5px;
+}

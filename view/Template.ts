@@ -4,7 +4,7 @@ interface ITemplate {
   getRange(): HTMLElement;
   getRollers(): NodeList;
   getInputs(): NodeList;
-  getOutput(): HTMLElement;
+  getOutputs(): NodeList;
 }
 
 
@@ -24,7 +24,7 @@ class Template implements ITemplate {
   private range: HTMLElement;
   private rollers: NodeList;
   private inputs: NodeList;
-  private output: HTMLElement;
+  private outputs: NodeList;
 
   constructor(container: HTMLElement, settings: templateSettings) {
     container.innerHTML = this.getTemplate(settings);
@@ -44,12 +44,12 @@ class Template implements ITemplate {
     let inputs : NodeList =
       container.querySelectorAll("input");
 
-    let output : HTMLElement | null =
-      container.querySelector(".slider__display");
+    let outputs : NodeList | null =
+      container.querySelectorAll(".slider__display");
 
     if (
       slider && scale &&
-      range && output &&
+      range && outputs.length &&
       rollers.length > 0 && inputs.length > 0
     ) {
       this.slider = slider;
@@ -57,7 +57,7 @@ class Template implements ITemplate {
       this.range = range;
       this.rollers = rollers;
       this.inputs = inputs;
-      this.output = output;
+      this.outputs = outputs;
     } else {
       throw Error("Не удалось отобразить слайдер на странице");
     }
@@ -84,8 +84,8 @@ class Template implements ITemplate {
     return this.inputs;
   }
 
-  public getOutput(): HTMLElement {
-    return this.output;
+  public getOutputs(): NodeList {
+    return this.outputs;
   }
 
   private getTemplate(settings: templateSettings): string {
@@ -102,13 +102,12 @@ class Template implements ITemplate {
                   step="${ step }"
                   value="${ values[0] }">` }
 
-        <output class="slider__display"></output>
         <div class="slider__scale slider__scale_${ type }">
           <div class="slider__range"></div>
           ${ range ?
-            `<div class="slider__roller slider__roller_first"></div>
-            <div class="slider__roller slider__roller_second"></div>`:
-            `<div class="slider__roller slider__roller_first"></div>` }
+            `<div class="slider__roller slider__roller_first"><output class="slider__display"></output></div>
+            <div class="slider__roller slider__roller_second"><output class="slider__display"></output></div>`:
+            `<div class="slider__roller slider__roller_first"><output class="slider__display"></output></div>` }
         </div>
       </div>`;
   }

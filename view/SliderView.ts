@@ -12,7 +12,7 @@ interface ISliderView {
   ): {value: number, descriptor: 0 | 1} | null;
   getRollers(): NodeList;
   getSlider(): HTMLElement;
-  // getSettings(): sliderSettings;
+  getSettings(): sliderSettings;
   takeRoller(roller: HTMLElement | PointerEvent): void;
   throwRoller(roller: HTMLElement): void;
   getScale(): HTMLElement;
@@ -22,7 +22,6 @@ interface ISliderView {
 
 class SliderView implements ISliderView {
   private scale: IScale;
-  // private output: IOutput;
   private minLimit: number; // минимально допустимое смещение бегунка,px
   private maxLimit: number; // максимально допустимое смещение бегунка, px
   private rollers: IRollers;
@@ -81,6 +80,8 @@ class SliderView implements ISliderView {
       // закрасим диапазон
       let { startPos, endPos } = this.calcStartEndPositionsOfRange();
       this.scale.paint(startPos, endPos);
+
+      this.updateOutputs();
 
       return {
         value: inputValue,
@@ -148,9 +149,17 @@ class SliderView implements ISliderView {
     return this.template.getRange();
   }
 
-  // public getSettings(): sliderSettings {
-  //   return this.settings;
-  // }
+  public getSettings(): sliderSettings {
+    return this.settings;
+  }
+
+  private updateOutputs() {
+    let outputs: NodeList = this.template.getOutputs();
+    let inputs: NodeList = this.inputs.getInputs();
+    inputs.forEach((el, i) => {
+      (outputs[i] as HTMLElement).innerText = (el as HTMLInputElement).value;
+    })
+  }
 
   // вычисляет максимально и минимально допустимые смещения ролика
   private calcLimits(roller: HTMLElement): void {
