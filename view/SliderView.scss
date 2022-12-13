@@ -36,6 +36,7 @@ input {
 .slider__scale {
   background-color: #e2dede;
   position: relative;
+  cursor: pointer;
 
   &_horizontal {
     width: 100%;
@@ -120,12 +121,13 @@ input {
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
-  padding: 0 7px;
+  padding: 2px 7px;
   background:linear-gradient(90deg, #ea9fb4, #C70039);
   margin-bottom: 5px;
   border-radius: 5px;
   color: white;
   font-weight: bold;
+  width: max-content;
 }
 
 .slider__scale_vertical .slider__display {
@@ -133,4 +135,8 @@ input {
   left: 100%;
   transform: translateY(50%);
   margin: 0 0 0 5px;
+}
+
+.slider__display_common {
+  margin-bottom: 9px;
 }

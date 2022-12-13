@@ -4,7 +4,7 @@ interface ITemplate {
   getRange(): HTMLElement;
   getRollers(): NodeList;
   getInputs(): NodeList;
-  getOutputs(): NodeList;
+  getOutputs(): Node[];
 }
 
 
@@ -24,7 +24,7 @@ class Template implements ITemplate {
   private range: HTMLElement;
   private rollers: NodeList;
   private inputs: NodeList;
-  private outputs: NodeList;
+  private outputs: Node [];
 
   constructor(container: HTMLElement, settings: templateSettings) {
     container.innerHTML = this.getTemplate(settings);
@@ -43,9 +43,10 @@ class Template implements ITemplate {
 
     let inputs : NodeList =
       container.querySelectorAll("input");
-
-    let outputs : NodeList | null =
-      container.querySelectorAll(".slider__display");
+    
+    let outputs : Node [] =
+      [...container.querySelectorAll(".slider__roller .slider__display"), 
+      (container.querySelector(".slider__display_common") as Node)];
 
     if (
       slider && scale &&
@@ -84,7 +85,7 @@ class Template implements ITemplate {
     return this.inputs;
   }
 
-  public getOutputs(): NodeList {
+  public getOutputs(): Node [] {
     return this.outputs;
   }
 
@@ -103,7 +104,12 @@ class Template implements ITemplate {
                   value="${ values[0] }">` }
 
         <div class="slider__scale slider__scale_${ type }">
-          <div class="slider__range"></div>
+          <div class="slider__range">
+          ${ range ? 
+            `<output class="slider__display slider__display_common">
+                <span class="slider__value"></span> - <span class="slider__value"></span>
+            </output>` : ``}
+          </div>
           ${ range ?
             `<div class="slider__roller slider__roller_first"><output class="slider__display"></output></div>
             <div class="slider__roller slider__roller_second"><output class="slider__display"></output></div>`:

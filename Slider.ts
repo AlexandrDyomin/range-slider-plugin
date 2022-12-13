@@ -41,23 +41,22 @@ class Slider implements ISliderController {
     };
 
     let settings: sliderSettings;
-
     // объединим дефолтные настройки с пользовательскими
     settings = { ...defaultSettings, ...userSettings };
-
+    
     // если пользователь перепутал поля для минимального и
     // максимального значений шкалы поменяем занчения местами
     let isWrongOrder: boolean = settings.min > settings.max;
     if (isWrongOrder) {
       [settings.min, settings.max] = [settings.max, settings.min];
     }
-
+    
     // зададим значения слайдера
     if (settings.range && settings.values.length === 1) {
       settings.values = [settings.min, settings.max];
     }
 
-    if (!settings.range && settings.values.length === 1){
+    if (!settings.range && settings.values === defaultSettings.values){
       settings.values = [settings.max / 2  + ( (settings.min - 0) / 2)];
     }
 

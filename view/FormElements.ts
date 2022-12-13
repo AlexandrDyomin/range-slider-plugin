@@ -1,6 +1,5 @@
 interface IFormElements {
   update(value: string, descriptor: 0 | 1): void;
-  getInputs(): NodeList;
 }
 
 
@@ -13,10 +12,6 @@ class FormElements implements IFormElements {
 
   public update(value: string, descriptor: 0 | 1 = 0): void {
     (<HTMLInputElement>this.inputs[descriptor]).value = value;
-  }
-
-  public getInputs(): NodeList {
-    return this.inputs;
   }
 }
 

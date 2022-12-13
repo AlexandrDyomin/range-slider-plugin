@@ -17,6 +17,8 @@ interface ISliderView {
   throwRoller(roller: HTMLElement): void;
   getScale(): HTMLElement;
   getRange(): HTMLElement;
+  getInputs(): NodeList;
+  getOutputs(): Node [];
 }
 
 
@@ -50,6 +52,12 @@ class SliderView implements ISliderView {
     // обновим положение бегунков в соответствие с переданными настройками
     this.settings.values.forEach( (value, i) => this.update(value, <0 | 1>i) );
   }
+  getOutputs(): Node[] {
+    return this.template.getOutputs();
+  }
+  getInputs(): NodeList {
+    return this.template.getInputs();
+  }
 
   public update(
     value: number | PointerEvent,
@@ -81,13 +89,17 @@ class SliderView implements ISliderView {
       let { startPos, endPos } = this.calcStartEndPositionsOfRange();
       this.scale.paint(startPos, endPos);
 
-      this.updateOutputs();
+      this.updateOutputs(descriptor);
 
       return {
         value: inputValue,
         descriptor: descriptor
       };
     } else {
+      if (descriptor !== undefined) {
+        this.updateOutputs(descriptor);
+      }
+
       return null;
     }
   }
@@ -153,12 +165,16 @@ class SliderView implements ISliderView {
     return this.settings;
   }
 
-  private updateOutputs() {
-    let outputs: NodeList = this.template.getOutputs();
-    let inputs: NodeList = this.inputs.getInputs();
-    inputs.forEach((el, i) => {
-      (outputs[i] as HTMLElement).innerText = (el as HTMLInputElement).value;
-    })
+  private updateOutputs(descriptor: 0 | 1) {
+    let output: HTMLElement = this.getOutputs()[descriptor] as HTMLElement;
+    let input: HTMLInputElement = this.getInputs()[descriptor] as HTMLInputElement;
+    output.innerText = input.value;
+    if (this.getSettings().range) {
+
+      output = (this.getOutputs()[2] as HTMLElement).children[descriptor] as HTMLElement;
+      // console.log( (this.getOutputs()[2] as HTMLElement))
+      output.innerText = input.value;
+    }
   }
 
   // вычисляет максимально и минимально допустимые смещения ролика
@@ -198,7 +214,7 @@ class SliderView implements ISliderView {
     let inputValue: number;
     let position: number;
 
-    this.inputs.getInputs().forEach( (input, i) => {
+    this.getInputs().forEach( (input, i) => {
       inputValue = +(<HTMLInputElement>input).value;
       position  = this.calcPosition(inputValue);
       this.rollers.slide(position, <0 | 1>i);
