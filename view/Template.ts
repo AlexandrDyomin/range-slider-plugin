@@ -106,7 +106,7 @@ class Template implements ITemplate {
         <div class="slider__scale slider__scale_${ type }">
           <div class="slider__range">
           ${ range ? 
-            `<output class="slider__display slider__display_common">
+            `<output class="slider__display slider__display_common slider__display_hidden">
                 <span class="slider__value"></span> - <span class="slider__value"></span>
             </output>` : ``}
           </div>

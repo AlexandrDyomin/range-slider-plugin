@@ -34,11 +34,11 @@ class SliderView implements ISliderView {
   constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;
     this.template = new Template(container, settings);
-    this.inputs = new FormElements(this.template.getInputs() );
-    this.rollers = new Rollers(this.template.getRollers(), settings.type);
+    this.inputs = new FormElements(this.getInputs() );
+    this.rollers = new Rollers(this.getRollers(), settings.type);
     this.scale = new Scale(
-      this.template.getScale(),
-      this.template.getRange(),
+      this.getScale(),
+      this.getRange(),
       this.rollers.getSize(),
       settings
     );
@@ -52,10 +52,12 @@ class SliderView implements ISliderView {
     // обновим положение бегунков в соответствие с переданными настройками
     this.settings.values.forEach( (value, i) => this.update(value, <0 | 1>i) );
   }
-  getOutputs(): Node[] {
+
+  public getOutputs(): Node[] {
     return this.template.getOutputs();
   }
-  getInputs(): NodeList {
+
+  public getInputs(): NodeList {
     return this.template.getInputs();
   }
 
@@ -67,7 +69,9 @@ class SliderView implements ISliderView {
     let position: number = this.calcPosition(value);
 
     // вычислим значение ролика и его номер
-    if (position !== this.rollers.getLastUpdatedPosition() ) {
+    if (position !== this.rollers.getLastUpdatedPosition() ||
+        this.getSettings().values[0] === this.getSettings().values[1]
+       ) {
       let inputValue: number;
 
       if (typeof value === "number" && descriptor !== undefined) {
@@ -91,6 +95,26 @@ class SliderView implements ISliderView {
 
       this.updateOutputs(descriptor);
 
+      if (this.getSettings().range) {
+        let [outputFirst, outputSecond ] = this.getOutputs();
+        let coordinatesOutputs: DOMRect[]= this.getElementsCoordinates(<HTMLElement>outputFirst, <HTMLElement>outputSecond);
+        if (this.getSettings().type === "horizontal") {
+          if (coordinatesOutputs[0].right >= coordinatesOutputs[1].left) {
+           this.showOutputCommon();
+          } else {
+           this.hiddeOutputCommon();
+          }
+        }
+
+        if (this.getSettings().type === "vertical") {
+          if (coordinatesOutputs[1].bottom >= coordinatesOutputs[0].top) {
+           this.showOutputCommon();
+          } else {
+           this.hiddeOutputCommon();
+          }
+        }
+      }
+
       return {
         value: inputValue,
         descriptor: descriptor
@@ -107,6 +131,15 @@ class SliderView implements ISliderView {
   public takeRoller(roller: HTMLElement | PointerEvent): void {
     if (roller instanceof HTMLElement) {
       this.rollers.determineDescriptor(roller);
+      
+      if (this.getSettings().range) {
+        roller.style.zIndex = "1";
+        
+        if (this.rollers.getDescriptor() === 0)
+        (<HTMLElement>this.getRollers()[1]).style.zIndex = "auto";
+      } else {
+        (<HTMLElement>this.getRollers()[0]).style.zIndex = "auto";
+      }
 
       // вычислим максимально и минимально допустимые смещения для ролика
       if (this.settings.range) {
@@ -170,11 +203,27 @@ class SliderView implements ISliderView {
     let input: HTMLInputElement = this.getInputs()[descriptor] as HTMLInputElement;
     output.innerText = input.value;
     if (this.getSettings().range) {
-
       output = (this.getOutputs()[2] as HTMLElement).children[descriptor] as HTMLElement;
-      // console.log( (this.getOutputs()[2] as HTMLElement))
       output.innerText = input.value;
     }
+  }
+
+  private showOutputCommon() {
+    let [outputFirst, outputSecond, outputCommon ] = this.getOutputs();
+    (<HTMLElement>outputCommon).classList.remove("slider__display_hidden");
+    (<HTMLElement>outputFirst).classList.add("slider__display_hidden");
+    (<HTMLElement>outputSecond).classList.add("slider__display_hidden");
+  }
+
+  private hiddeOutputCommon() {
+    let [outputFirst, outputSecond, outputCommon ] = this.getOutputs();
+    (<HTMLElement>outputCommon).classList.add("slider__display_hidden");
+    (<HTMLElement>outputFirst).classList.remove("slider__display_hidden");
+    (<HTMLElement>outputSecond).classList.remove("slider__display_hidden");
+  }
+
+  private getElementsCoordinates(...elements: HTMLElement []): DOMRect[] {
+    return elements.map(el => el.getBoundingClientRect());
   }
 
   // вычисляет максимально и минимально допустимые смещения ролика

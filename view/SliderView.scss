@@ -140,3 +140,11 @@ input {
 .slider__display_common {
   margin-bottom: 9px;
 }
+
+.slider__display_hidden {
+  visibility: hidden;
+}
+
+.slider__scale_vertical .slider__display_common {
+  margin: 0 0 0 9px;
+}
