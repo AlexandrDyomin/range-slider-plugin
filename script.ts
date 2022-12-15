@@ -5,7 +5,9 @@ import "./view/SliderView.scss";
 let h: Slider = new Slider("h", {
   min: -50,
   max: 100,
-  values: [10]
+  values: [10],
+  names: ["qwe"],
+  prefix: "$"
 });
 
 let hr: Slider = new Slider("hr", {
@@ -13,7 +15,10 @@ let hr: Slider = new Slider("hr", {
   step: 1,
   min: -50,
   max: 50,
-  values: [-20, 0]
+  values: [-20, 0],
+  names: ["ddd", "sssdsd"],
+  prefix: "$"
+
 });
 
 let v: Slider = new Slider("v", {

@@ -4,6 +4,7 @@ import SliderView from "./view/SliderView";
 import SliderModel from "./model/SliderModel";
 import SliderController from "./controller/SliderController";
 import type { ISliderController  } from "./controller/SliderController";
+import type { templateSettings } from "./view/Template";
 
 
 // тип настроек слайдера
@@ -14,6 +15,8 @@ type sliderSettings = {
   type: "horizontal" | "vertical",
   range: boolean,
   values:[number, number] | [number],
+  names?:  [string, string?],
+  prefix?: string
   // create(event: Event, ui: SliderController): void,
   // start(event: Event, ui: SliderController): void,
   // slide(event: Event, ui: SliderController): void,
@@ -32,7 +35,7 @@ class Slider implements ISliderController {
       step: 1,
       type: "horizontal",
       range: false,
-      values: [50]
+      values: [50],
       // create(event: Event, ui: SliderController): void{},
       // start(event: Event, ui: SliderController): void{},
       // slide(event: Event, ui: SliderController): void{},

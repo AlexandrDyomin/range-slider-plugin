@@ -15,6 +15,8 @@ type templateSettings = {
   type: "horizontal" | "vertical",
   range: boolean,
   values: [number, number] | [number]
+  names?: [string, string?]
+  prefix?: string
 }
 
 
@@ -90,18 +92,19 @@ class Template implements ITemplate {
   }
 
   private getTemplate(settings: templateSettings): string {
-    let { range, type, min, max, values, step } = settings;
+    let { range, type, min, max, values, step, names, prefix } = settings;
 
     return `
       <div class="slider">
         ${ range ?
-          `<input class="slider__min-val" value="${values[0]}">
-          <input class="slider__max-val" value="${values[1]}">` :
+          `<input class="slider__min-val" value="${values[0]}" name = "${names ? names[0] : ``}">
+          <input class="slider__max-val" value="${values[1]}" name = "${names ? names[1] : ``}">` :
           `<input class="slider-default_hidden"
                   type="range" min="${ min }"
                   max="${ max }"
                   step="${ step }"
-                  value="${ values[0] }">` }
+                  value="${values[0]}"
+                  name = "${names ? names[0] : ``}">` }
 
         <div class="slider__scale slider__scale_${ type }">
           <div class="slider__range">
@@ -121,4 +124,4 @@ class Template implements ITemplate {
 
 
 export default Template;
-export type { ITemplate };
+export type { ITemplate, templateSettings };

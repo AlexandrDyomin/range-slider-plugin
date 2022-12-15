@@ -1,4 +1,4 @@
-import type { sliderSettings } from "../Slider";
+import type { templateSettings } from "./Template";
 import FormElements, { IFormElements } from "./FormElements";
 import Rollers, { IRollers } from "./Rollers";
 import Scale, { IScale } from "./Scale";
@@ -12,7 +12,7 @@ interface ISliderView {
   ): {value: number, descriptor: 0 | 1} | null;
   getRollers(): NodeList;
   getSlider(): HTMLElement;
-  getSettings(): sliderSettings;
+  getSettings(): templateSettings;
   takeRoller(roller: HTMLElement | PointerEvent): void;
   throwRoller(roller: HTMLElement): void;
   getScale(): HTMLElement;
@@ -29,9 +29,9 @@ class SliderView implements ISliderView {
   private rollers: IRollers;
   private template: ITemplate;
   private inputs: IFormElements;
-  private settings: sliderSettings;
+  private settings: templateSettings;
 
-  constructor(container: HTMLElement, settings: sliderSettings) {
+  constructor(container: HTMLElement, settings: templateSettings) {
     this.settings = settings;
     this.template = new Template(container, settings);
     this.inputs = new FormElements(this.getInputs() );
@@ -194,17 +194,18 @@ class SliderView implements ISliderView {
     return this.template.getRange();
   }
 
-  public getSettings(): sliderSettings {
+  public getSettings(): templateSettings {
     return this.settings;
   }
 
   private updateOutputs(descriptor: 0 | 1) {
     let output: HTMLElement = this.getOutputs()[descriptor] as HTMLElement;
     let input: HTMLInputElement = this.getInputs()[descriptor] as HTMLInputElement;
-    output.innerText = input.value;
+    output.innerText = `${input.value}${this.getSettings().prefix ? " " + this.getSettings().prefix : ""}`;
+
     if (this.getSettings().range) {
       output = (this.getOutputs()[2] as HTMLElement).children[descriptor] as HTMLElement;
-      output.innerText = input.value;
+      output.innerText = `${input.value}${this.getSettings().prefix ? " " + this.getSettings().prefix : ""}`;
     }
   }
 
