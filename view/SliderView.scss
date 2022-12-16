@@ -50,6 +50,35 @@ input {
   }
 }
 
+// разметка шкалы
+.grid {
+  position: absolute;
+  top: 100%;
+  margin-top: 5 px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.grid__mark {
+  display: inline-block;
+  width: 1px;
+  height: 4px;
+  background-color: #000;
+}
+
+.grid__mark:first-child {
+  margin-left: 12px;
+}
+
+.grid__mark:last-child {
+  margin-right: 12px;
+}
+
+.grid__mark:nth-child(5n + 1) {
+  height: 8px;
+}
+
 
 //  закрашиваемый диапазон
 .slider__range {
