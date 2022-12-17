@@ -44,6 +44,10 @@ class Scale implements IScale {
     this.scaleOffset = this.calcScaleOffset();
     this.step = this.calcStep();
     this.numberOfDecimalPlaces = this.countDecimalPlaces(settings.step);
+
+    document.addEventListener("scroll", () => {
+      this.scaleOffset = this.calcScaleOffset();
+    })
   }
 
   public paint(startPos: number, endPos: number): void {

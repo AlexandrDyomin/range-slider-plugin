@@ -311,7 +311,6 @@ class SliderView implements ISliderView {
     let position: number;
 
     if (typeof value === "number") {
-
       position = value / (this.settings.max - this.settings.min);
       position *= this.scale.getScaleSize();
       position -= this.scale.getZeroOffset();
