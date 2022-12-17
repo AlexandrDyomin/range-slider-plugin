@@ -54,29 +54,77 @@ input {
 .grid {
   position: absolute;
   top: 100%;
-  margin-top: 5 px;
+  margin-top: 5px;
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
+.slider__scale_vertical .grid {
+  flex-direction: column-reverse;
+  top: auto;
+  right: 100%;
+  width: auto;
+  height: 100%;
+  margin-top: 0;
+  margin-right: 5px;
+  align-items: flex-end;
+}
+
 .grid__mark {
+  position: relative;
   display: inline-block;
   width: 1px;
   height: 4px;
-  background-color: #000;
+  background-color: rgb(151, 146, 146);
+}
+
+.slider__scale_vertical .grid__mark {
+  width: 4px;
+  height: 1px;
 }
 
 .grid__mark:first-child {
   margin-left: 12px;
 }
 
+.slider__scale_vertical .grid__mark:first-child {
+  margin-left: 0;
+  margin-bottom: 12px;
+}
+
 .grid__mark:last-child {
   margin-right: 12px;
 }
 
+.slider__scale_vertical .grid__mark:last-child {
+  margin-right: 0;
+  margin-top: 12px;
+}
+
 .grid__mark:nth-child(5n + 1) {
   height: 8px;
+}
+
+.slider__scale_vertical .grid__mark:nth-child(5n + 1) {
+  width: 8px;
+  height: 1px;
+}
+
+.grid__text {
+  display: inline-block;
+  position: absolute;
+  top: 100%;
+  transform: translateX(-50%);
+  color:rgb(57, 54, 54);
+  font-size: 12px;
+}
+
+.slider__scale_vertical .grid__text {
+  top: auto;
+  right: 100%;
+  transform: translate(0, -50%);
+  margin-right: 3px;
 }
 
 

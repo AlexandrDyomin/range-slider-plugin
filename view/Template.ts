@@ -16,7 +16,8 @@ type templateSettings = {
   range: boolean,
   values: [number, number] | [number]
   names?: [string, string?]
-  prefix?: string
+  prefix?: string,
+  grid?: boolean
 }
 
 

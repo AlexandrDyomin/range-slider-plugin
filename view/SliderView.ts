@@ -3,6 +3,7 @@ import FormElements, { IFormElements } from "./FormElements";
 import Rollers, { IRollers } from "./Rollers";
 import Scale, { IScale } from "./Scale";
 import Template, { ITemplate } from "./Template";
+import Grid from "./Grid";
 
 
 interface ISliderView {
@@ -30,6 +31,8 @@ class SliderView implements ISliderView {
   private template: ITemplate;
   private inputs: IFormElements;
   private settings: templateSettings;
+  private grid;
+  
 
   constructor(container: HTMLElement, settings: templateSettings) {
     this.settings = settings;
@@ -42,8 +45,15 @@ class SliderView implements ISliderView {
       this.rollers.getSize(),
       settings
     );
+
+    if (this.settings.grid) {
+      this.grid = new Grid([this.settings.min, this.settings.max]);
+      this.getScale().prepend(this.grid.getGridTemplate());
+    }
+
     this.minLimit = 0;
     this.maxLimit = this.scale.getScaleSize();
+
 
     // добавим объекту window обработчик на событие resize
     this.handleDocumentResize = this.handleDocumentResize.bind(this);

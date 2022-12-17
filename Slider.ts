@@ -16,7 +16,8 @@ type sliderSettings = {
   range: boolean,
   values:[number, number] | [number],
   names?:  [string, string?],
-  prefix?: string
+  prefix?: string,
+  grid?: boolean
   // create(event: Event, ui: SliderController): void,
   // start(event: Event, ui: SliderController): void,
   // slide(event: Event, ui: SliderController): void,

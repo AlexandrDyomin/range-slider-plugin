@@ -7,25 +7,27 @@ let h: Slider = new Slider("h", {
   max: 100,
   values: [10],
   names: ["qwe"],
-  prefix: "$"
+  prefix: "$",
+  grid: true,
+  step: 10
 });
 
 let hr: Slider = new Slider("hr", {
   range: true,
-  step: 1,
+  step: 5,
   min: -50,
   max: 50,
   values: [-20, 0],
   names: ["ddd", "sssdsd"],
-  prefix: "$"
-
+  prefix: "$",
+  grid: true,
 });
 
 let v: Slider = new Slider("v", {
   min: 0,
   max: 100,
-  step: 50,
   type: "vertical",
+  grid: true
 
 });
 
@@ -33,7 +35,7 @@ let vr: Slider = new Slider("vr", {
   range: true,
   min: 0,
   max: 100,
-  step: 1,
   values: [0, 30],
-  type: "vertical"
+  type: "vertical",
+  prefix: "$",
 });
