@@ -25,7 +25,7 @@ let hr: Slider = new Slider("hr", {
 
 let v: Slider = new Slider("v", {
   min: 0,
-  max: 100,
+  max: 1000,
   type: "vertical",
   grid: true
 
@@ -34,8 +34,10 @@ let v: Slider = new Slider("v", {
 let vr: Slider = new Slider("vr", {
   range: true,
   min: 0,
-  max: 100,
+  max: 250,
   values: [0, 30],
+  step: 16.5,
   type: "vertical",
   prefix: "$",
+  grid: true
 });

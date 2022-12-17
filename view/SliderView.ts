@@ -105,25 +105,7 @@ class SliderView implements ISliderView {
 
       this.updateOutputs(descriptor);
 
-      if (this.getSettings().range) {
-        let [outputFirst, outputSecond ] = this.getOutputs();
-        let coordinatesOutputs: DOMRect[]= this.getElementsCoordinates(<HTMLElement>outputFirst, <HTMLElement>outputSecond);
-        if (this.getSettings().type === "horizontal") {
-          if (coordinatesOutputs[0].right >= coordinatesOutputs[1].left) {
-           this.showOutputCommon();
-          } else {
-           this.hiddeOutputCommon();
-          }
-        }
-
-        if (this.getSettings().type === "vertical") {
-          if (coordinatesOutputs[1].bottom >= coordinatesOutputs[0].top) {
-           this.showOutputCommon();
-          } else {
-           this.hiddeOutputCommon();
-          }
-        }
-      }
+      this.rerenderOutputs();
 
       return {
         value: inputValue,
@@ -233,6 +215,28 @@ class SliderView implements ISliderView {
     (<HTMLElement>outputSecond).classList.remove("slider__display_hidden");
   }
 
+  private rerenderOutputs() {
+    if (this.getSettings().range) {
+      let [outputFirst, outputSecond ] = this.getOutputs();
+      let coordinatesOutputs: DOMRect[]= this.getElementsCoordinates(<HTMLElement>outputFirst, <HTMLElement>outputSecond);
+      if (this.getSettings().type === "horizontal") {
+        if (coordinatesOutputs[0].right >= coordinatesOutputs[1].left) {
+          this.showOutputCommon();
+        } else {
+          this.hiddeOutputCommon();
+        }
+      }
+
+      if (this.getSettings().type === "vertical") {
+        if (coordinatesOutputs[1].bottom >= coordinatesOutputs[0].top) {
+          this.showOutputCommon();
+        } else {
+          this.hiddeOutputCommon();
+        }
+      }
+    } 
+  }
+
   private getElementsCoordinates(...elements: HTMLElement []): DOMRect[] {
     return elements.map(el => el.getBoundingClientRect());
   }
@@ -283,27 +287,7 @@ class SliderView implements ISliderView {
     let { startPos, endPos } = this.calcStartEndPositionsOfRange();
     this.scale.paint(startPos, endPos);
 
-
-    
-    // if (this.getSettings().range) {
-    //   let [outputFirst, outputSecond ] = this.getOutputs();
-    //   let coordinatesOutputs: DOMRect[]= this.getElementsCoordinates(<HTMLElement>outputFirst, <HTMLElement>outputSecond);
-    //   if (this.getSettings().type === "horizontal") {
-    //     if (coordinatesOutputs[0].right >= coordinatesOutputs[1].left) {
-    //      this.showOutputCommon();
-    //     } else {
-    //      this.hiddeOutputCommon();
-    //     }
-    //   }
-
-    //   if (this.getSettings().type === "vertical") {
-    //     if (coordinatesOutputs[1].bottom >= coordinatesOutputs[0].top) {
-    //      this.showOutputCommon();
-    //     } else {
-    //      this.hiddeOutputCommon();
-    //     }
-    //   }
-    // }
+    this.rerenderOutputs();
   }
 
   // расчитывает смещение бегунка относительно шкалы
