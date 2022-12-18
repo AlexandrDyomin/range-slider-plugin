@@ -18,7 +18,13 @@ type sliderSettings = {
   names?:  [string, string?],
   prefix?: string,
   grid?: boolean
-  // create(event: Event, ui: SliderController): void,
+  create?(data: {
+    inputs: [HTMLInputElement, HTMLInputElement?],
+    container: HTMLElement,
+    slider: Slider,
+    positions: [number, number?]
+
+  }): void,
   // start(event: Event, ui: SliderController): void,
   // slide(event: Event, ui: SliderController): void,
   // stop(event: Event, ui: SliderController): void,
@@ -73,7 +79,7 @@ class Slider implements ISliderController {
     // создадим шкалу
     let scale: Scale = new Scale(settings.max, settings.min, settings.step);
 
-    // создадим модуль слайдера
+    // создадим модель слайдера
     let sliderModel: SliderModel = new SliderModel(rollers, scale);
 
     // контейнер для инициализации слайдера
