@@ -318,10 +318,11 @@ class SliderView implements ISliderView {
     let validValue = this.getNearestValidValue(position);
     if (validValue !== position) return validValue;
 
-    // вычислим на какое количество шагов необходимо сдвинуть бегунок
-    let steps = this.calcCountSteps(position);
-
-    position = this.rollers.getLastUpdatedPosition() + steps * this.scale.getStep();
+    if (value.type === 'pointermove') {
+      // вычислим на какое количество шагов необходимо сдвинуть бегунок
+      let steps = this.calcCountSteps(position);
+      position = this.rollers.getLastUpdatedPosition() + steps * this.scale.getStep();  
+    } 
 
     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     validValue = this.getNearestValidValue(position);

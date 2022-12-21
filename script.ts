@@ -5,11 +5,11 @@ import "./view/SliderView.scss";
 let h: Slider = new Slider("h", {
   min: -50,
   max: 100,
-  values: [10],
+  values: [25],
   names: ["qwe"],
   prefix: "$",
   grid: true,
-  step: 10
+  step: 1
 });
 
 let hr: Slider = new Slider("hr", {
@@ -41,3 +41,5 @@ let vr: Slider = new Slider("vr", {
   prefix: "$",
   grid: true
 });
+
+h.setValue(-50)

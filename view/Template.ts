@@ -103,7 +103,6 @@ class Template implements ITemplate {
           `<input class="slider-default_hidden"
                   type="range" min="${ min }"
                   max="${ max }"
-                  step="${ step }"
                   value="${values[0]}"
                   name = "${names ? names[0] : ``}">` }
 
