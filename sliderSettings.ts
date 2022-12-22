@@ -1,4 +1,4 @@
-import type { Slider } from './Slider';
+// import type { Slider } from './Slider';
 
 
 type sliderSettings = {
@@ -11,13 +11,13 @@ type sliderSettings = {
   names?:  [string, string?],
   prefix?: string,
   grid?: boolean
-  create?(data: {
-    inputs: HTMLInputElement[],
-    container: HTMLElement,
-    slider: Slider,
-    positions: [number, number?]
+  // create?(data: {
+  //   inputs: HTMLInputElement[],
+  //   container: HTMLElement,
+  //   slider: Slider,
+  //   positions: [number, number?]
 
-  }): void,
+  // }): void,
   // start(event: Event, ui: SliderController): void,
   // slide(event: Event, ui: SliderController): void,
   // stop(event: Event, ui: SliderController): void,

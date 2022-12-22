@@ -10,7 +10,7 @@ interface ITemplate {
 }
 
 type templateSettings = Pick<
-  sliderSettings, 'min' | 'max' | 'type' | 'values' | 'names' | 'range'
+  sliderSettings, 'min' | 'max' | 'type' | 'values' | 'names' | 'range' | 'grid'
 >;
 
 export type { ITemplate, templateSettings };

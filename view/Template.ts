@@ -77,6 +77,7 @@ class Template implements ITemplate {
       <div class='slider'>
         ${this.getTemplateForInputs()}
         <div class='slider__scale slider__scale_${ this.settings.type }'>
+          ${this.settings.grid && this.getTemplateForGrid()}
           ${this.getTemplateForRange()}
           ${this.getTemplateForRollers()}
         </div>
@@ -150,6 +151,32 @@ class Template implements ITemplate {
     }
 
     return template;
+  }
+
+  private getTemplateForGrid(): string {
+    let { min, max } = this.settings;
+    let grid: HTMLElement = document.createElement('div');
+    grid.className = 'grid';
+     
+    let numberOfMarks: number = 21;
+    for (let i = 0; i < numberOfMarks; i++) {
+      let mark: HTMLElement = document.createElement('span');
+      mark.className = 'grid__mark';
+      grid.append(mark);
+    }
+
+    let step: number = (max - min) * 0.25;
+    let value: number = min;
+    let marks: HTMLCollection = grid.children;
+    for(let i = 0; i < numberOfMarks; i += 5) {
+      let valueOfMark: HTMLElement = document.createElement('span');
+      valueOfMark.textContent = `${value}`;
+      valueOfMark.className = 'grid__text';
+      marks[i].append(valueOfMark);
+      value += step;
+    }
+
+    return grid.outerHTML;
   }
 }
 
