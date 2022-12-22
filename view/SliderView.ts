@@ -1,11 +1,12 @@
 import type { templateSettings } from './Template';
 import type { IScale } from './typingForScale';
+import type { sliderSettings } from '../sliderSettings';
+import type { ITemplate } from './typingForTemplate';
 import FormElements, { IFormElements } from './FormElements';
 import Rollers, { IRollers } from './Rollers';
 import Scale from './Scale';
-import Template, { ITemplate } from './Template';
+import Template from './Template';
 import Grid from './Grid';
-
 
 interface ISliderView {
   update(
@@ -14,7 +15,7 @@ interface ISliderView {
   ): {value: number, descriptor: 0 | 1} | null;
   getRollers(): NodeList;
   getSlider(): HTMLElement;
-  getSettings(): templateSettings;
+  getSettings(): sliderSettings;
   takeRoller(roller: HTMLElement | PointerEvent): void;
   throwRoller(roller: HTMLElement): void;
   getScale(): HTMLElement;
@@ -31,11 +32,11 @@ class SliderView implements ISliderView {
   private rollers: IRollers;
   private template: ITemplate;
   private inputs: IFormElements;
-  private settings: templateSettings;
+  private settings: sliderSettings;
   private grid;
   
 
-  constructor(container: HTMLElement, settings: templateSettings) {
+  constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;
     this.template = new Template(container, settings);
     this.inputs = new FormElements(this.getInputs() );
@@ -187,7 +188,7 @@ class SliderView implements ISliderView {
     return this.template.getRange();
   }
 
-  public getSettings(): templateSettings {
+  public getSettings(): sliderSettings {
     return this.settings;
   }
 
