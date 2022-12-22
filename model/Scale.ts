@@ -1,77 +1,62 @@
-interface IScale{
-  getMinValue(): number;
-  setMinValue(value: number): void;
-  getMaxValue(): number;
-  setMaxValue(value: number): void;
-  getStep(): number;
-  setStep(value: number): void
-}
-
+import type { IScale, scaleSettings } from './typingForScale';
 
 class Scale implements IScale {
-  private minValue: number = 0;
-  private maxValue: number;
+  private min: number = 0;
+  private max: number;
   private step: number = 1;
-  private scaleSize: number;
 
-  constructor(
-    maxValue: number,
-    minValue: number,
-    step: number
-  ) {
+  constructor(settings: scaleSettings) {
+    let { min, max, step } = settings;
 
-      if (maxValue === minValue) throw Error("Некорректный размер шкалы");
+    if (max === min) throw Error("Некорректный размер шкалы");
 
-      if (maxValue < minValue) {
-        [this.minValue, this.maxValue] = [maxValue, minValue];
-      } else {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-      }
+    if (max < min) {
+      [this.min, this.max] = [max, min];
+    } else {
+      this.min = min;
+      this.max = max;
+    }
 
-        this.scaleSize = this.maxValue - this.minValue;
-        this.setStep(step);
-    };
+    this.setStep(step);
+  };
 
-  public getMinValue(): number {
-    return this.minValue;
+  getMinValue(): number {
+    return this.min;
   }
 
-  public setMinValue(value: number) {
-    if (value === this.maxValue) throw Error("Минимальное значение не должно быть равно максимальному");
+  setMinValue(value: number) {
+    if (value === this.max) throw Error("Минимальное значение не должно быть равно максимальному");
 
-    if (value > this.maxValue) {
-      [this.minValue, this.maxValue] = [this.minValue, value];
+    if (value > this.max) {
+      [this.min, this.max] = [this.min, value];
     } else {
-      this.minValue = value;
+      this.min = value;
     }
   }
 
-  public getMaxValue(): number {
-    return this.maxValue;
+  getMaxValue(): number {
+    return this.max;
   }
 
-  public setMaxValue(value: number) {
-    if (value === this.minValue) throw Error("Максиимальное значение не должно быть равно минимальному");
+  setMaxValue(value: number) {
+    if (value === this.min) throw Error("Максиимальное значение не должно быть равно минимальному");
 
-    if (value < this.minValue) {
-      [this.minValue, this.maxValue] = [value, this.minValue];
+    if (value < this.min) {
+      [this.min, this.max] = [value, this.min];
     } else {
-      this.maxValue = value;
+      this.max = value;
     }
   }
 
-  public getStep(): number {
+  getStep(): number {
     return this.step;
   }
 
-  public setStep(value: number): void {
+  setStep(value: number): void {
     if (value < 0) throw Error("Некорректное значение шага");
     this.step = value;
   }
 }
 
-
 module.exports = Scale;
 export default Scale;
-export type { IScale };

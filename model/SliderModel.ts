@@ -1,5 +1,5 @@
 import type { IRoller } from "./Roller";
-import type { IScale } from "./Scale";
+import type { IScale } from "./typingForScale";
 
 
 interface ISliderModel extends IScale{

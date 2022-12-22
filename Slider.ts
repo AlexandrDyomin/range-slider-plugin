@@ -77,7 +77,7 @@ class Slider implements ISliderController {
       rollers = [new Roller(settings.values[0])];
 
     // создадим шкалу
-    let scale: Scale = new Scale(settings.max, settings.min, settings.step);
+    let scale: Scale = new Scale(settings);
 
     // создадим модель слайдера
     let sliderModel: SliderModel = new SliderModel(rollers, scale);

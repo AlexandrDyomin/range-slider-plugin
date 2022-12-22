@@ -2,15 +2,15 @@ const Scale = require("./Scale.ts");
 
 describe("Scale: constructor", () => {
   test("Should be throw error", () => {
-    expect( () => new Scale(10, 0, -4) ).toThrow();
-    expect( () => new Scale(10, 10, -1) ).toThrow();
+    expect( () => new Scale({ max:10, min:0, step: -4 }) ).toThrow();
+    expect( () => new Scale({ max:10, min:10, step: -1 }) ).toThrow();
   });
 });
 
 
 let scale;
 beforeAll( () => {
- scale = new Scale(10, -5, 1);
+ scale = new Scale({ max:10, min:-5, step: 1 });
 });
 
 
@@ -60,7 +60,7 @@ describe("Scale: setMinValue", () => {
 
   let scale;
   beforeEach( () => {
-    scale = new Scale(10, -5, 1);
+    scale = new Scale({ max:10, min:-5,step:  1 });
   });
 
   test("The min value should be 0. The max value should not change", () => {
@@ -91,7 +91,7 @@ describe("Scale: setMaxValue", () => {
 
   let scale;
   beforeEach( () => {
-    scale = new Scale(10, -5, 1);
+    scale = new Scale({ max:10, min:-5,step:  1 });
   });
 
   test("The max value should be 0. The min value should not change", () => {
