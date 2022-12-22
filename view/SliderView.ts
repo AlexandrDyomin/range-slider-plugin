@@ -1,9 +1,10 @@
-import type { templateSettings } from "./Template";
-import FormElements, { IFormElements } from "./FormElements";
-import Rollers, { IRollers } from "./Rollers";
-import Scale, { IScale } from "./Scale";
-import Template, { ITemplate } from "./Template";
-import Grid from "./Grid";
+import type { templateSettings } from './Template';
+import type { IScale } from './typingForScale';
+import FormElements, { IFormElements } from './FormElements';
+import Rollers, { IRollers } from './Rollers';
+import Scale from './Scale';
+import Template, { ITemplate } from './Template';
+import Grid from './Grid';
 
 
 interface ISliderView {
@@ -57,7 +58,7 @@ class SliderView implements ISliderView {
 
     // добавим объекту window обработчик на событие resize
     this.handleDocumentResize = this.handleDocumentResize.bind(this);
-    window.addEventListener("resize", this.handleDocumentResize);
+    window.addEventListener('resize', this.handleDocumentResize);
 
     // обновим положение бегунков в соответствие с переданными настройками
     this.settings.values.forEach( (value, i) => this.update(value, <0 | 1>i) );
@@ -84,7 +85,7 @@ class SliderView implements ISliderView {
        ) {
       let inputValue: number;
 
-      if (typeof value === "number" && descriptor !== undefined) {
+      if (typeof value === 'number' && descriptor !== undefined) {
         // переместим бегунок
         this.rollers.slide(position, descriptor);
         inputValue = value;
@@ -125,12 +126,12 @@ class SliderView implements ISliderView {
       this.rollers.determineDescriptor(roller);
       
       if (this.getSettings().range) {
-        roller.style.zIndex = "1";
+        roller.style.zIndex = '1';
         
         if (this.rollers.getDescriptor() === 0)
-        (<HTMLElement>this.getRollers()[1]).style.zIndex = "auto";
+        (<HTMLElement>this.getRollers()[1]).style.zIndex = 'auto';
       } else {
-        (<HTMLElement>this.getRollers()[0]).style.zIndex = "auto";
+        (<HTMLElement>this.getRollers()[0]).style.zIndex = 'auto';
       }
 
       // вычислим максимально и минимально допустимые смещения для ролика
@@ -147,7 +148,7 @@ class SliderView implements ISliderView {
     let posSecondRolller = this.rollers.getPosition(1);
     let posCursor: number;
 
-    if (this.settings.type === "horizontal") {
+    if (this.settings.type === 'horizontal') {
       posCursor = roller.clientX - this.scale.getScaleOffset();
     } else {
       posCursor = roller.clientY - this.scale.getScaleOffset();
@@ -193,33 +194,33 @@ class SliderView implements ISliderView {
   private updateOutputs(descriptor: 0 | 1) {
     let output: HTMLElement = this.getOutputs()[descriptor] as HTMLElement;
     let input: HTMLInputElement = this.getInputs()[descriptor] as HTMLInputElement;
-    output.innerText = `${input.value}${this.getSettings().prefix ? " " + this.getSettings().prefix : ""}`;
+    output.innerText = `${input.value}${this.getSettings().prefix ? ' ' + this.getSettings().prefix : ''}`;
 
     if (this.getSettings().range) {
       output = (this.getOutputs()[2] as HTMLElement).children[descriptor] as HTMLElement;
-      output.innerText = `${input.value}${this.getSettings().prefix ? " " + this.getSettings().prefix : ""}`;
+      output.innerText = `${input.value}${this.getSettings().prefix ? ' ' + this.getSettings().prefix : ''}`;
     }
   }
 
   private showOutputCommon() {
     let [outputFirst, outputSecond, outputCommon ] = this.getOutputs();
-    (<HTMLElement>outputCommon).classList.remove("slider__display_hidden");
-    (<HTMLElement>outputFirst).classList.add("slider__display_hidden");
-    (<HTMLElement>outputSecond).classList.add("slider__display_hidden");
+    (<HTMLElement>outputCommon).classList.remove('slider__display_hidden');
+    (<HTMLElement>outputFirst).classList.add('slider__display_hidden');
+    (<HTMLElement>outputSecond).classList.add('slider__display_hidden');
   }
 
   private hiddeOutputCommon() {
     let [outputFirst, outputSecond, outputCommon ] = this.getOutputs();
-    (<HTMLElement>outputCommon).classList.add("slider__display_hidden");
-    (<HTMLElement>outputFirst).classList.remove("slider__display_hidden");
-    (<HTMLElement>outputSecond).classList.remove("slider__display_hidden");
+    (<HTMLElement>outputCommon).classList.add('slider__display_hidden');
+    (<HTMLElement>outputFirst).classList.remove('slider__display_hidden');
+    (<HTMLElement>outputSecond).classList.remove('slider__display_hidden');
   }
 
   private rerenderOutputs() {
     if (this.getSettings().range) {
       let [outputFirst, outputSecond ] = this.getOutputs();
       let coordinatesOutputs: DOMRect[]= this.getElementsCoordinates(<HTMLElement>outputFirst, <HTMLElement>outputSecond);
-      if (this.getSettings().type === "horizontal") {
+      if (this.getSettings().type === 'horizontal') {
         if (coordinatesOutputs[0].right >= coordinatesOutputs[1].left) {
           this.showOutputCommon();
         } else {
@@ -227,7 +228,7 @@ class SliderView implements ISliderView {
         }
       }
 
-      if (this.getSettings().type === "vertical") {
+      if (this.getSettings().type === 'vertical') {
         if (coordinatesOutputs[1].bottom >= coordinatesOutputs[0].top) {
           this.showOutputCommon();
         } else {
@@ -243,7 +244,7 @@ class SliderView implements ISliderView {
 
   // вычисляет максимально и минимально допустимые смещения ролика
   private calcLimits(roller: HTMLElement): void {
-    if (this.settings.type === "horizontal") {
+    if (this.settings.type === 'horizontal') {
       if (roller === this.template.getRollers()[0]) {
         this.minLimit = 0;
         this.maxLimit= this.rollers.getPosition(1);
@@ -294,19 +295,19 @@ class SliderView implements ISliderView {
   private calcPosition(value: number | PointerEvent): number {
     let position: number;
 
-    if (typeof value === "number") {
+    if (typeof value === 'number') {
       position = value / (this.settings.max - this.settings.min);
       position *= this.scale.getScaleSize();
       position -= this.scale.getZeroOffset();
 
-      if (this.settings.type ==="vertical") {
+      if (this.settings.type ==='vertical') {
         position = this.scale.getScaleSize() - position
       }
 
       return position;
     }
 
-    if (this.settings.type === "vertical") {
+    if (this.settings.type === 'vertical') {
       position = value.clientY - this.scale.getScaleOffset();
     } else {
       position = value.clientX - this.scale.getScaleOffset();
@@ -364,7 +365,7 @@ class SliderView implements ISliderView {
       endPos = this.rollers.getPosition(0);
     }
 
-    if (this.settings.type === "horizontal"){
+    if (this.settings.type === 'horizontal'){
       endPos = this.scale.getScaleSize() - endPos;
     } else {
       if (this.settings.range) {
