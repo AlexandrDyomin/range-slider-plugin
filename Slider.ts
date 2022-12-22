@@ -71,7 +71,7 @@ class Slider implements ISliderController {
     }
 
     // если слайдер с диапазоном создадим два бегунка, иначе один
-    let rollers: [Roller, Roller?];
+    let rollers: [Roller, Roller] | [Roller];
     settings.range && settings.values.length === 2 ?
       rollers = [new Roller(settings.values[0]), new Roller(settings.values[1]) ] :
       rollers = [new Roller(settings.values[0])];

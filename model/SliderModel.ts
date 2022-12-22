@@ -1,20 +1,18 @@
 import type { IRoller } from "./Roller";
 import type { IScale } from "./typingForScale";
 
-
 interface ISliderModel extends IScale{
   getValue(): [number, number] | number;
-  setValue(value: number, descriptor: number): void;
+  setValue(value: number, descriptor: 0 | 1): void;
 };
-
 
 class SliderModel implements ISliderModel {
   constructor(
-    private rollers:[IRoller, IRoller?],
+    private rollers:[IRoller, IRoller] | [IRoller],
     private scale: IScale
   ) {
       this.rollers.forEach( (roller, i) => {
-        let isValid: boolean = this.checkValue(roller!.getValue(), i)
+        let isValid: boolean = this.checkValue(roller.getValue(), i)
         if (!isValid) {
           throw Error("Некорректное значение бегунка")
         }
@@ -23,20 +21,19 @@ class SliderModel implements ISliderModel {
 
   getValue(): [number, number] | number  {
     return this.rollers.length === 2 ?
-      [this.rollers[0].getValue(), this.rollers[1]!.getValue()] :
+      [this.rollers[0].getValue(), this.rollers[1].getValue()] :
       this.rollers[0].getValue();
   }
 
-  setValue(value: number, descriptor: number) {
+  setValue(value: number, descriptor: 0 | 1) {
     let isIntoRange: boolean =
       this.checkValue(value, descriptor);
 
-    if (isIntoRange) {
-      this.rollers[descriptor]!.setValue(value);
+    if (isIntoRange ) {
+      this.rollers[descriptor]?.setValue(value);
     } else {
       throw Error("Некорректное значение бегунка");
     }
-
   }
 
   getMinValue(): number {
@@ -85,7 +82,6 @@ class SliderModel implements ISliderModel {
     return isNotLess && isNotMore;
   }
 }
-
 
 export default SliderModel;
 export type { ISliderModel };
