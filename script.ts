@@ -1,6 +1,4 @@
 import Slider from "./Slider";
-import "./view/SliderView.scss";
-
 
 let h: Slider = new Slider("h", {
   min: -50,
@@ -41,26 +39,3 @@ let vr: Slider = new Slider("vr", {
   prefix: "$",
   grid: true
 });
-
-
-
-// let ids = Array(1000).fill(0);
-// let boxes = [];
-// ids.forEach((el, i, array) => {
-//   array[i] = +Math.random();
-//   let box = document.createElement('div');
-//   box.id = array[i];
-//   box.style.marginBottom = '80px'
-//   boxes.push(box)
-// });
-
-// document.body.append(...boxes);
-// boxes.forEach((box) => new Slider(box.id, {
-//   min: -50,
-//   max: 100,
-//   values: [25],
-//   names: ["qwe"],
-//   prefix: "$",
-//   grid: true,
-//   step: 1
-// }))

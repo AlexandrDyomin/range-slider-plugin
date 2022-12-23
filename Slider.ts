@@ -4,8 +4,7 @@ import SliderView from "./view/SliderView";
 import SliderModel from "./model/SliderModel";
 import SliderController from "./controller/SliderController";
 import type { ISliderController  } from "./controller/SliderController";
-import type { templateSettings } from "./view/Template";
-
+import "./view/SliderView.scss";
 
 // тип настроек слайдера
 type sliderSettings = {

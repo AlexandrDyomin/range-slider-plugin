@@ -59,7 +59,7 @@ class SliderController implements ISliderController {
         this.currentRoller = target;
         // найдём ближаший ролик от позиции клика
         this.view.takeRoller(e);
-        let props: { value: number, descriptor: number } | null = this.view.update(e);
+        let props: { value: number, descriptor: 0 | 1 } | null = this.view.update(e);
 
         // если бегунок перемещен обновим модель
         if (props) {
@@ -77,7 +77,7 @@ class SliderController implements ISliderController {
 
   private handleDocumentPointermove(e: PointerEvent): void {
     // обновим view
-    let props: { value: number, descriptor: number } | null = this.view.update(e);
+    let props: { value: number, descriptor: 0 | 1 } | null = this.view.update(e);
 
     // если бегунок перемещен обновим модель
     if (props) {
