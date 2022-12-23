@@ -4,6 +4,7 @@ import type { ITemplate } from './typingForTemplate';
 import type { IRollers } from './typingForRollers';
 import { FormElements, IFormElements } from './FormElements';
 import { FillableRange, IFillableRange } from './FillableRange';
+import { Outputs, IOutputs } from './Outputs';
 import Rollers from './Rollers';
 import Scale from './Scale';
 import Template from './Template';
@@ -33,6 +34,7 @@ class SliderView implements ISliderView {
   private template: ITemplate;
   private inputs: IFormElements;
   private range: IFillableRange;
+  private outputs: IOutputs;
   private settings: sliderSettings;
 
   constructor(container: HTMLElement, settings: sliderSettings) {
@@ -41,6 +43,7 @@ class SliderView implements ISliderView {
     this.inputs = new FormElements(this.getInputs());
     this.rollers = new Rollers(this.getRollers(), settings.type);
     this.range = new FillableRange(this.getRange(), settings.type);
+    this.outputs = new Outputs(this.getOutputs(), settings);
     this.scale = new Scale(
       this.getScale(),
       this.getRange(),
@@ -99,9 +102,9 @@ class SliderView implements ISliderView {
       let { startPos, endPos } = this.calcStartEndPositionsOfRange();
       this.range.paint(startPos, endPos);
 
-      this.updateOutputs(descriptor);
+      this.outputs.updateOutputs(descriptor, inputValue);
 
-      this.rerenderOutputs();
+      this.outputs.rerenderOutputs();
 
       return {
         value: inputValue,
@@ -109,7 +112,7 @@ class SliderView implements ISliderView {
       };
     } else {
       if (descriptor !== undefined) {
-        this.updateOutputs(descriptor);
+        this.outputs.updateOutputs(descriptor, this.scale.calcValue(position));
       }
 
       return null;
@@ -186,57 +189,6 @@ class SliderView implements ISliderView {
     return this.settings;
   }
 
-  private updateOutputs(descriptor: 0 | 1) {
-    let output: HTMLElement = this.getOutputs()[descriptor] as HTMLElement;
-    let input: HTMLInputElement = this.getInputs()[descriptor] as HTMLInputElement;
-    output.innerText = `${input.value}${this.getSettings().prefix ? ' ' + this.getSettings().prefix : ''}`;
-
-    if (this.getSettings().range) {
-      output = (this.getOutputs()[2] as HTMLElement).children[descriptor] as HTMLElement;
-      output.innerText = `${input.value}${this.getSettings().prefix ? ' ' + this.getSettings().prefix : ''}`;
-    }
-  }
-
-  private showOutputCommon() {
-    let [outputFirst, outputSecond, outputCommon ] = this.getOutputs();
-    (<HTMLElement>outputCommon).classList.remove('slider__display_hidden');
-    (<HTMLElement>outputFirst).classList.add('slider__display_hidden');
-    (<HTMLElement>outputSecond).classList.add('slider__display_hidden');
-  }
-
-  private hiddeOutputCommon() {
-    let [outputFirst, outputSecond, outputCommon ] = this.getOutputs();
-    (<HTMLElement>outputCommon).classList.add('slider__display_hidden');
-    (<HTMLElement>outputFirst).classList.remove('slider__display_hidden');
-    (<HTMLElement>outputSecond).classList.remove('slider__display_hidden');
-  }
-
-  private rerenderOutputs() {
-    if (this.getSettings().range) {
-      let [outputFirst, outputSecond ] = this.getOutputs();
-      let coordinatesOutputs: DOMRect[]= this.getElementsCoordinates(<HTMLElement>outputFirst, <HTMLElement>outputSecond);
-      if (this.getSettings().type === 'horizontal') {
-        if (coordinatesOutputs[0].right >= coordinatesOutputs[1].left) {
-          this.showOutputCommon();
-        } else {
-          this.hiddeOutputCommon();
-        }
-      }
-
-      if (this.getSettings().type === 'vertical') {
-        if (coordinatesOutputs[1].bottom >= coordinatesOutputs[0].top) {
-          this.showOutputCommon();
-        } else {
-          this.hiddeOutputCommon();
-        }
-      }
-    } 
-  }
-
-  private getElementsCoordinates(...elements: HTMLElement []): DOMRect[] {
-    return elements.map(el => el.getBoundingClientRect());
-  }
-
   // вычисляет максимально и минимально допустимые смещения ролика
   private calcLimits(roller: HTMLElement): void {
     if (this.settings.type === 'horizontal') {
@@ -283,7 +235,7 @@ class SliderView implements ISliderView {
     let { startPos, endPos } = this.calcStartEndPositionsOfRange();
     this.range.paint(startPos, endPos);
 
-    this.rerenderOutputs();
+    this.outputs.rerenderOutputs();
   }
 
   // расчитывает смещение бегунка относительно шкалы
@@ -371,7 +323,6 @@ class SliderView implements ISliderView {
     return { startPos, endPos };
   }
 }
-
 
 export default SliderView;
 export type { ISliderView };

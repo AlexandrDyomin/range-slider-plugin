@@ -9,10 +9,9 @@ class FormElements implements IFormElements {
     this.inputs = inputs;
   }
 
-  public update(value: string, descriptor: 0 | 1 = 0): void {
+  update(value: string, descriptor: 0 | 1 = 0): void {
     (<HTMLInputElement>this.inputs[descriptor]).value = value;
   }
 }
-
 
 export  { FormElements, IFormElements };

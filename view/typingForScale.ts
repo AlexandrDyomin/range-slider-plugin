@@ -1,4 +1,4 @@
-import type { sliderSettings } from "../sliderSettings";
+import type { sliderSettings } from '../sliderSettings';
 
 interface IScale {
   calcValue(position: number): number;
