@@ -32,16 +32,6 @@ class Scale implements IScale {
     })
   }
 
-  paint(startPos: number, endPos: number): void {
-    if (this.settings.type === 'horizontal'){
-      this.range.style.left = `${ startPos }px`;
-      this.range.style.right = `${ endPos }px`;
-    } else {
-      this.range.style.bottom = `${ startPos }px`;
-      this.range.style.top = `${ endPos }px`;
-    }
-  }
-
   calcValue(position: number): number {
     // вычислим значение ролика
     let value: number = position / this.scaleSize;

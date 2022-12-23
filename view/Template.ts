@@ -181,4 +181,3 @@ class Template implements ITemplate {
 }
 
 export default Template;
-export type { ITemplate, templateSettings };

@@ -2,9 +2,8 @@ interface IFormElements {
   update(value: string, descriptor: 0 | 1): void;
 }
 
-
 class FormElements implements IFormElements {
-  private inputs: NodeList; // контейнер для инпутов
+  private inputs: NodeList;
 
   constructor(inputs: NodeList) {
     this.inputs = inputs;
@@ -16,5 +15,4 @@ class FormElements implements IFormElements {
 }
 
 
-export type { IFormElements };
-export default FormElements;
+export  { FormElements, IFormElements };

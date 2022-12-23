@@ -1,8 +1,10 @@
 import type { IScale } from './typingForScale';
 import type { sliderSettings } from '../sliderSettings';
 import type { ITemplate } from './typingForTemplate';
-import FormElements, { IFormElements } from './FormElements';
-import Rollers, { IRollers } from './Rollers';
+import type { IRollers } from './typingForRollers';
+import { FormElements, IFormElements } from './FormElements';
+import { FillableRange, IFillableRange } from './FillableRange';
+import Rollers from './Rollers';
 import Scale from './Scale';
 import Template from './Template';
 
@@ -30,13 +32,15 @@ class SliderView implements ISliderView {
   private rollers: IRollers;
   private template: ITemplate;
   private inputs: IFormElements;
+  private range: IFillableRange;
   private settings: sliderSettings;
 
   constructor(container: HTMLElement, settings: sliderSettings) {
     this.settings = settings;
     this.template = new Template(container, settings);
-    this.inputs = new FormElements(this.getInputs() );
+    this.inputs = new FormElements(this.getInputs());
     this.rollers = new Rollers(this.getRollers(), settings.type);
+    this.range = new FillableRange(this.getRange(), settings.type);
     this.scale = new Scale(
       this.getScale(),
       this.getRange(),
@@ -93,7 +97,7 @@ class SliderView implements ISliderView {
 
       // закрасим диапазон
       let { startPos, endPos } = this.calcStartEndPositionsOfRange();
-      this.scale.paint(startPos, endPos);
+      this.range.paint(startPos, endPos);
 
       this.updateOutputs(descriptor);
 
@@ -277,7 +281,7 @@ class SliderView implements ISliderView {
     });
 
     let { startPos, endPos } = this.calcStartEndPositionsOfRange();
-    this.scale.paint(startPos, endPos);
+    this.range.paint(startPos, endPos);
 
     this.rerenderOutputs();
   }
