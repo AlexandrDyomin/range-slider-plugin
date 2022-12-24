@@ -4,11 +4,12 @@ import SliderView from './view/SliderView';
 import SliderModel from './model/SliderModel';
 import SliderController from './controller/SliderController';
 import type { ISliderController  } from './controller/SliderController';
+import type { eventNames, sliderSettings } from './sliderSettings';
 import './view/SliderView.scss';
-import type { sliderSettings } from './sliderSettings';
 
 class Slider implements ISliderController {
   private controller: ISliderController;
+  private settings: sliderSettings;
 
   constructor(container: string, userSettings: object) {
     let defaultSettings: sliderSettings = {
@@ -40,6 +41,8 @@ class Slider implements ISliderController {
       settings.values = [settings.max / 2  + ( (settings.min - 0) / 2)];
     }
 
+    this.settings = settings;
+
     // если слайдер с диапазоном создадим два бегунка, иначе один
     let rollers: [Roller, Roller] | [Roller];
     settings.range && settings.values.length === 2 ?
@@ -59,12 +62,14 @@ class Slider implements ISliderController {
     if ($container) {
       let view = new SliderView($container, settings);
       this.controller = new SliderController(view, sliderModel);
+     
       settings.create?.({
-        container: $container,
-        inputs: view.getInputs(),
-        slider: this,
-        positions: view.getRollersPositions()
+        values: this.getValue(),
+        positions: view.getRollersPositions(),
+        slider: this
       });
+      this.addListener(view, 'slide');
+      this.addListener(view, 'change');
     } else {
       throw Error(`не найден контейнер c id '${container}'`);
     }
@@ -76,6 +81,14 @@ class Slider implements ISliderController {
 
   setValue(value: number, descriptor: 0 | 1 = 0): void {
     this.controller.setValue(value, descriptor);
+  }
+
+  private addListener = (view: SliderView, eventName: eventNames) => {
+    view.getSlider().addEventListener(eventName, (e: any) => this.settings[eventName]?.({
+      values: e.detail.values,
+      positions: e.detail.positions,
+      slider: this 
+    }));
   }
 }
 

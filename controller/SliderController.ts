@@ -1,12 +1,10 @@
-import type { ISliderModel } from "../model/SliderModel";
-import type { ISliderView } from "../view/SliderView";
-
+import type { ISliderModel } from '../model/SliderModel';
+import type { ISliderView } from '../view/SliderView';
 
 interface ISliderController {
   getValue(): [number, number] | number;
   setValue(value: number, descriptor: 0 | 1): void;
 }
-
 
 class SliderController implements ISliderController {
   private view: ISliderView; // view слайдера
@@ -17,14 +15,9 @@ class SliderController implements ISliderController {
     this.view = view;
     this.slider = slider;
 
-    // укажем контекст выполнения для обработчиков
-    this.handleContainerPointerdown = this.handleContainerPointerdown.bind(this);
-    this.handleDocumentPointermove = this.handleDocumentPointermove.bind(this);
-    this.handleContainerPointerup = this.handleContainerPointerup.bind(this);
-
     // добавим обработчики на события pointerdown, pointermove, pointerup
-    this.view.getSlider().addEventListener("pointerdown", this.handleContainerPointerdown);
-    document.addEventListener("pointerup", this.handleContainerPointerup);
+    this.view.getSlider().addEventListener('pointerdown', this.handleDocumentPointerdown);
+    document.addEventListener('pointerup', this.handleDocumentPointerup);
   }
 
   // возвращает значения бегунков
@@ -37,13 +30,15 @@ class SliderController implements ISliderController {
     try {
       this.slider.setValue(value, descriptor);
       this.view.update(value, descriptor);
+      
+      this.dispatchCustomEvent('change');
     } catch(e) {
         console.error(e);
     }
   }
 
   // обработчики событий указателя
-  private handleContainerPointerdown(e: PointerEvent): void {
+  private handleDocumentPointerdown = (e: PointerEvent): void => {
     // добавим обработчик на событие pointermove если оно произошло на бегунке
     if (e.button === 0 ) {
       let target: HTMLElement = e.target as HTMLElement;
@@ -52,7 +47,7 @@ class SliderController implements ISliderController {
 
 
       if (this.isRoller(target) || target === scale || target === range) {
-        document.addEventListener("pointermove", this.handleDocumentPointermove);
+        document.addEventListener('pointermove', this.handleDocumentPointermove);
       }
 
       if (target === scale || target === range) {
@@ -65,6 +60,8 @@ class SliderController implements ISliderController {
         if (props) {
           let { value, descriptor } = props;
           this.slider.setValue(value, descriptor);
+
+          this.dispatchCustomEvent('change');
         }
       }
 
@@ -75,7 +72,18 @@ class SliderController implements ISliderController {
     }
   }
 
-  private handleDocumentPointermove(e: PointerEvent): void {
+  private dispatchCustomEvent(eventName: string): void {
+    const event = new CustomEvent(eventName, {
+      detail: {
+        values: this.getValue(),
+        positions: this.view.getRollersPositions()
+      }    
+    });
+    this.view.getSlider().dispatchEvent(event);
+  }
+
+
+  private handleDocumentPointermove = (e: PointerEvent): void => {
     // обновим view
     let props: { value: number, descriptor: 0 | 1 } | null = this.view.update(e);
 
@@ -83,12 +91,15 @@ class SliderController implements ISliderController {
     if (props) {
       let { value, descriptor } = props;
       this.slider.setValue(value, descriptor);
+
+      this.dispatchCustomEvent('slide');
+      this.dispatchCustomEvent('change');
     }
   }
 
-  private handleContainerPointerup(e: PointerEvent): void {
+  private handleDocumentPointerup = (e: PointerEvent): void => {
     // удалим обработчик на событие pointermove
-    document.removeEventListener("pointermove", this.handleDocumentPointermove);
+    document.removeEventListener('pointermove', this.handleDocumentPointermove);
     this.view.throwRoller(this.currentRoller!);
   }
 
@@ -99,7 +110,6 @@ class SliderController implements ISliderController {
     return isFirstRoller || isSecondRoller;
   }
 }
-
 
 export default SliderController;
 export type { ISliderController };

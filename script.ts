@@ -8,9 +8,6 @@ let h: Slider = new Slider("h", {
   prefix: "$",
   grid: true,
   step: 1,
-  create: (data: any) => {
-    console.log(data.positions)
-  }
 });
 
 let hr: Slider = new Slider("hr", {
@@ -22,8 +19,14 @@ let hr: Slider = new Slider("hr", {
   names: ["ddd", "sssdsd"],
   prefix: "$",
   grid: true,
+  change: (data: any) => {
+    console.log("change", data.values)
+  },
+  slide: (data: any) => {
+    console.log("slide", data.values)
+  },
   create: (data: any) => {
-    console.log(data.slider)
+    console.log('create', data.values)
   }
 });
 
@@ -31,7 +34,7 @@ let v: Slider = new Slider("v", {
   min: 0,
   max: 1000,
   type: "vertical",
-  grid: true
+  grid: true,
 
 });
 
@@ -45,3 +48,5 @@ let vr: Slider = new Slider("vr", {
   prefix: "$",
   grid: true
 });
+
+hr.setValue(33, 1)

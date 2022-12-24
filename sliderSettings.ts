@@ -1,5 +1,13 @@
 import type { Slider } from './Slider';
 
+type sliderEvent = {
+  values: [number, number] | number,
+  positions: [number, number?] 
+  slider: Slider,
+}
+
+type eventNames = 'slide' | 'change'| 'create' | 'start' | 'stop';
+
 type sliderSettings = {
   min: number,
   max: number,
@@ -10,16 +18,11 @@ type sliderSettings = {
   names?:  [string, string?],
   prefix?: string,
   grid?: boolean,
-  create?(data: {
-    inputs: NodeList,
-    container: HTMLElement,
-    slider: Slider,
-    positions: [number, number?]   
-  }): void,
-  // start(event: Event, ui: SliderController): void,
-  // slide(event: Event, ui: SliderController): void,
-  // stop(event: Event, ui: SliderController): void,
-  // change(event: Event, ui: SliderController): void
+  create?(data: sliderEvent): void,
+  start?(data: sliderEvent): void,
+  slide?(data: sliderEvent): void,
+  stop?(data: sliderEvent): void,
+  change?(data: sliderEvent): void
 };
 
-export type { sliderSettings };
+export type { sliderSettings, eventNames };
