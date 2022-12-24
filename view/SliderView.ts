@@ -46,6 +46,14 @@ class SliderView implements ISliderView {
     this.settings.values.forEach( (value, i) => this.update(value, <0 | 1>i) );
   }
 
+  getRollersPositions(): [number, number?] {
+    let positions: [number, number?] | [] = [0];
+    for (let i = 0; i < this.getRollers().length; i++) {
+      positions[i] = this.rollers.getPosition(i);
+    }
+    return positions;
+  }
+
   getOutputs(): Node[] {
     return this.template.getOutputs();
   }

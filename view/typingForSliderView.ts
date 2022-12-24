@@ -14,6 +14,7 @@ interface ISliderView {
   getRange(): HTMLElement;
   getInputs(): NodeList;
   getOutputs(): Node [];
+  getRollersPositions(): [number, number?];
 }
 
 export type { ISliderView };

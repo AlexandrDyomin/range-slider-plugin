@@ -1,35 +1,11 @@
-import Scale from"./model/Scale";
-import Roller from "./model/Roller";
-import SliderView from "./view/SliderView";
-import SliderModel from "./model/SliderModel";
-import SliderController from "./controller/SliderController";
-import type { ISliderController  } from "./controller/SliderController";
-import "./view/SliderView.scss";
-
-// тип настроек слайдера
-type sliderSettings = {
-  min: number,
-  max: number,
-  step: number,
-  type: "horizontal" | "vertical",
-  range: boolean,
-  values:[number, number] | [number],
-  names?:  [string, string?],
-  prefix?: string,
-  grid?: boolean
-  create?(data: {
-    inputs: [HTMLInputElement, HTMLInputElement?],
-    container: HTMLElement,
-    slider: Slider,
-    positions: [number, number?]
-
-  }): void,
-  // start(event: Event, ui: SliderController): void,
-  // slide(event: Event, ui: SliderController): void,
-  // stop(event: Event, ui: SliderController): void,
-  // change(event: Event, ui: SliderController): void
-};
-
+import Scale from'./model/Scale';
+import Roller from './model/Roller';
+import SliderView from './view/SliderView';
+import SliderModel from './model/SliderModel';
+import SliderController from './controller/SliderController';
+import type { ISliderController  } from './controller/SliderController';
+import './view/SliderView.scss';
+import type { sliderSettings } from './sliderSettings';
 
 class Slider implements ISliderController {
   private controller: ISliderController;
@@ -39,14 +15,9 @@ class Slider implements ISliderController {
       min: 0,
       max: 100,
       step: 1,
-      type: "horizontal",
+      type: 'horizontal',
       range: false,
-      values: [50],
-      // create(event: Event, ui: SliderController): void{},
-      // start(event: Event, ui: SliderController): void{},
-      // slide(event: Event, ui: SliderController): void{},
-      // stop(event: Event, ui: SliderController): void{},
-      // change(event: Event, ui: SliderController): void{}
+      values: [50]
     };
 
     let settings: sliderSettings;
@@ -88,20 +59,25 @@ class Slider implements ISliderController {
     if ($container) {
       let view = new SliderView($container, settings);
       this.controller = new SliderController(view, sliderModel);
+      settings.create?.({
+        container: $container,
+        inputs: view.getInputs(),
+        slider: this,
+        positions: view.getRollersPositions()
+      });
     } else {
-      throw Error(`не найден контейнер c id "${container}"`);
+      throw Error(`не найден контейнер c id '${container}'`);
     }
   }
 
-  public getValue(): [number, number] | number {
+  getValue(): [number, number] | number {
     return this.controller.getValue();
   }
 
-  public setValue(value: number, descriptor: 0 | 1 = 0): void {
+  setValue(value: number, descriptor: 0 | 1 = 0): void {
     this.controller.setValue(value, descriptor);
   }
 }
 
-
 export default Slider;
-export type { sliderSettings };
+export type { Slider };

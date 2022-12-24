@@ -7,7 +7,10 @@ let h: Slider = new Slider("h", {
   names: ["qwe"],
   prefix: "$",
   grid: true,
-  step: 1
+  step: 1,
+  create: (data: any) => {
+    console.log(data.positions)
+  }
 });
 
 let hr: Slider = new Slider("hr", {
@@ -19,6 +22,9 @@ let hr: Slider = new Slider("hr", {
   names: ["ddd", "sssdsd"],
   prefix: "$",
   grid: true,
+  create: (data: any) => {
+    console.log(data.slider)
+  }
 });
 
 let v: Slider = new Slider("v", {
