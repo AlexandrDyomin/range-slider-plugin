@@ -2,29 +2,13 @@ import type { IScale } from './typingForScale';
 import type { sliderSettings } from '../sliderSettings';
 import type { ITemplate } from './typingForTemplate';
 import type { IRollers } from './typingForRollers';
+import type{ ISliderView } from './typingForSliderView';
 import { FormElements, IFormElements } from './FormElements';
 import { FillableRange, IFillableRange } from './FillableRange';
 import { Outputs, IOutputs } from './Outputs';
 import Rollers from './Rollers';
 import Scale from './Scale';
 import Template from './Template';
-
-interface ISliderView {
-  update(
-    value: number | PointerEvent,
-    descriptor?: 0 | 1
-  ): {value: number, descriptor: 0 | 1} | null;
-  getRollers(): NodeList;
-  getSlider(): HTMLElement;
-  getSettings(): sliderSettings;
-  takeRoller(roller: HTMLElement | PointerEvent): void;
-  throwRoller(roller: HTMLElement): void;
-  getScale(): HTMLElement;
-  getRange(): HTMLElement;
-  getInputs(): NodeList;
-  getOutputs(): Node [];
-}
-
 
 class SliderView implements ISliderView {
   private scale: IScale;
@@ -62,15 +46,15 @@ class SliderView implements ISliderView {
     this.settings.values.forEach( (value, i) => this.update(value, <0 | 1>i) );
   }
 
-  public getOutputs(): Node[] {
+  getOutputs(): Node[] {
     return this.template.getOutputs();
   }
 
-  public getInputs(): NodeList {
+  getInputs(): NodeList {
     return this.template.getInputs();
   }
 
-  public update(
+  update(
     value: number | PointerEvent,
     descriptor?: 0 | 1
   ): { value: number, descriptor: 0 | 1 } | null {
@@ -119,7 +103,7 @@ class SliderView implements ISliderView {
     }
   }
 
-  public takeRoller(roller: HTMLElement | PointerEvent): void {
+  takeRoller(roller: HTMLElement | PointerEvent): void {
     if (roller instanceof HTMLElement) {
       this.rollers.determineDescriptor(roller);
       
@@ -165,27 +149,27 @@ class SliderView implements ISliderView {
     this.calcLimits(this.template.getRollers()[descriptor] as HTMLElement);
   }
 
-  public throwRoller(roller: HTMLElement): void {
+  throwRoller(roller: HTMLElement): void {
 
   }
 
-  public getRollers(): NodeList {
+  getRollers(): NodeList {
     return this.template.getRollers();
   }
 
-  public getSlider(): HTMLElement {
+  getSlider(): HTMLElement {
     return this.template.getSlider();
   }
 
-  public getScale(): HTMLElement {
+  getScale(): HTMLElement {
     return this.template.getScale();
   }
 
-  public getRange(): HTMLElement {
+  getRange(): HTMLElement {
     return this.template.getRange();
   }
 
-  public getSettings(): sliderSettings {
+  getSettings(): sliderSettings {
     return this.settings;
   }
 
