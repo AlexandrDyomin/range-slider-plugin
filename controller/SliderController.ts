@@ -52,7 +52,6 @@ class SliderController implements ISliderController {
       }
 
       if (target === scale || target === range) {
-        this.currentRoller = target;
         // найдём ближаший ролик от позиции клика
         this.view.takeRoller(e);
         let props: { value: number, descriptor: 0 | 1 } | null = this.view.update(e);

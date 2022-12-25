@@ -84,9 +84,21 @@ class SliderView implements ISliderView {
         descriptor = this.rollers.getDescriptor();
       }
 
+      if (value instanceof PointerEvent && value.type === 'pointerdown') {
+       this.addSmoothTransition(descriptor);
+      }
+
       // переместим бегунок
       this.rollers.slide(position, descriptor);
 
+      if (value instanceof PointerEvent && value.type === 'pointerdown') {
+        setTimeout(this.removeSmoothTransition, 300, descriptor)
+      }
+
+      if (value instanceof PointerEvent && value.type === 'pointermove') {
+       this.removeSmoothTransition(descriptor);
+      }
+      
       // обновим значение инпута
       this.inputs.update(inputValue.toString(), descriptor);
 
@@ -313,6 +325,16 @@ class SliderView implements ISliderView {
     }
 
     return { startPos, endPos };
+  }
+
+  private addSmoothTransition(descriptor: 0 | 1): void {
+    this.getRange().classList.add('slider__range_smooth');
+    (<HTMLElement>this.getRollers()[descriptor]).classList.add('slider__roller_smooth');
+  }
+
+  private removeSmoothTransition = (descriptor: 0 |1): void => {
+    this.getRange().classList.remove('slider__range_smooth');
+    (<HTMLElement>this.getRollers()[descriptor]).classList.remove('slider__roller_smooth');
   }
 }
 
