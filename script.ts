@@ -27,6 +27,12 @@ let hr: Slider = new Slider("hr", {
   },
   create: (data: any) => {
     console.log('create', data.values)
+  },
+  stop: (data: any) => {
+    console.log('stop', data.values)
+  },
+  start: (data: any) => {
+    console.log('start', data.values)
   }
 });
 

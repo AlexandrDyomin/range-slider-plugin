@@ -68,8 +68,10 @@ class Slider implements ISliderController {
         positions: view.getRollersPositions(),
         slider: this
       });
+      this.addListener(view, 'start');
       this.addListener(view, 'slide');
       this.addListener(view, 'change');
+      this.addListener(view, 'stop')
     } else {
       throw Error(`не найден контейнер c id '${container}'`);
     }

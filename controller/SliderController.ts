@@ -10,6 +10,7 @@ class SliderController implements ISliderController {
   private view: ISliderView; // view слайдера
   private slider: ISliderModel; // модель слайдера
   private currentRoller: HTMLElement | null = null;
+  private isFirstSlideOfroller: boolean = true;
 
   constructor(view: ISliderView, slider: ISliderModel) {
     this.view = view;
@@ -21,12 +22,12 @@ class SliderController implements ISliderController {
   }
 
   // возвращает значения бегунков
-  public getValue(): [number, number] | number {
+  getValue(): [number, number] | number {
     return this.slider.getValue();
   }
 
   // устанавливает значния бегунков
-  public setValue(value: number, descriptor: 0 | 1 = 0): void {
+  setValue(value: number, descriptor: 0 | 1 = 0): void {
     try {
       this.slider.setValue(value, descriptor);
       this.view.update(value, descriptor);
@@ -60,7 +61,7 @@ class SliderController implements ISliderController {
         if (props) {
           let { value, descriptor } = props;
           this.slider.setValue(value, descriptor);
-
+          this.dispatchCustomEvent('slide');
           this.dispatchCustomEvent('change');
         }
       }
@@ -92,12 +93,21 @@ class SliderController implements ISliderController {
       let { value, descriptor } = props;
       this.slider.setValue(value, descriptor);
 
+      if (this.isFirstSlideOfroller) {
+        this.dispatchCustomEvent('start');
+        this.isFirstSlideOfroller = false;
+      }
       this.dispatchCustomEvent('slide');
       this.dispatchCustomEvent('change');
     }
   }
 
   private handleDocumentPointerup = (e: PointerEvent): void => {
+    if (!this.isFirstSlideOfroller) {
+      this.dispatchCustomEvent('stop');
+      this.isFirstSlideOfroller = true;
+    }
+
     // удалим обработчик на событие pointermove
     document.removeEventListener('pointermove', this.handleDocumentPointermove);
     this.view.throwRoller(this.currentRoller!);
