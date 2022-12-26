@@ -27,6 +27,37 @@ input {
   opacity: 0;
 }
 
+.slider > input:first-child:focus + .slider__scale .slider__roller_first,
+.slider > input:first-child:focus + input + .slider__scale .slider__roller_first,
+.slider > input:nth-child(2):focus + .slider__scale .slider__roller_second {
+  outline: 2px solid rgba(7, 7, 8, 0.5);
+  outline-offset: -2px;
+}
+
+.slider > input:first-child:focus + .slider__scale .slider__roller_first:after,
+.slider > input:first-child:focus + input + .slider__scale .slider__roller_first::after,
+.slider > input:nth-child(2):focus + .slider__scale .slider__roller_second::after  {
+  animation: 0.5s infinite alternate focus; 
+}
+
+@keyframes focus {
+  from {
+    background:  $color;
+  }
+  25% {
+    background: rgba($color, 0.85);
+  }
+  50% {
+    background: rgba($color, 0.5);
+  }
+  75% {
+    background: rgba($color, 0.25);
+  }
+  to {
+    background: rgba($color, 0);
+  }
+}
+
 
 // шкала и закрашиваемый диапазон
 .slider__scale,

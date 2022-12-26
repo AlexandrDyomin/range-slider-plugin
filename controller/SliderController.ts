@@ -42,7 +42,9 @@ class SliderController implements ISliderController {
 
   // обработчики событий указателя
   private handleDocumentPointerdown = (e: PointerEvent | TouchEvent): void => {
-    e.preventDefault();
+    if (e instanceof TouchEvent) {
+      e.preventDefault();
+    }
 
     // добавим обработчик на событие pointermove если оно произошло на бегунке
     if (e instanceof TouchEvent || (e instanceof PointerEvent && e.button === 0)) {
@@ -89,7 +91,6 @@ class SliderController implements ISliderController {
 
 
   private handleDocumentPointermove = (e: PointerEvent | TouchEvent): void => {
-    e.preventDefault();
     // обновим view
     let props: { value: number, descriptor: 0 | 1 } | null = this.view.update(e);
 
@@ -108,8 +109,6 @@ class SliderController implements ISliderController {
   }
 
   private handleDocumentPointerup = (e: PointerEvent | TouchEvent): void => {
-    e.preventDefault();
-
     if (!this.isFirstSlideOfroller) {
       this.dispatchCustomEvent('stop');
       this.isFirstSlideOfroller = true;
