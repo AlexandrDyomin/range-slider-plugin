@@ -19,6 +19,8 @@ class SliderController implements ISliderController {
     // добавим обработчики на события pointerdown, pointermove, pointerup
     this.view.getSlider().addEventListener('pointerdown', this.handleDocumentPointerdown);
     document.addEventListener('pointerup', this.handleDocumentPointerup);
+    this.view.getSlider().addEventListener('touchstart', this.handleDocumentPointerdown);
+    document.addEventListener('touchend', this.handleDocumentPointerup);
   }
 
   // возвращает значения бегунков
@@ -39,9 +41,9 @@ class SliderController implements ISliderController {
   }
 
   // обработчики событий указателя
-  private handleDocumentPointerdown = (e: PointerEvent): void => {
+  private handleDocumentPointerdown = (e: PointerEvent | TouchEvent): void => {
     // добавим обработчик на событие pointermove если оно произошло на бегунке
-    if (e.button === 0 ) {
+    if (e instanceof TouchEvent || (e instanceof PointerEvent && e.button === 0) ) {
       let target: HTMLElement = e.target as HTMLElement;
       let scale: HTMLElement = this.view.getScale();
       let range: HTMLElement = this.view.getRange();
@@ -49,6 +51,7 @@ class SliderController implements ISliderController {
 
       if (this.isRoller(target) || target === scale || target === range) {
         document.addEventListener('pointermove', this.handleDocumentPointermove);
+        document.addEventListener('touchmove', this.handleDocumentPointermove);
       }
 
       if (target === scale || target === range) {
@@ -83,7 +86,7 @@ class SliderController implements ISliderController {
   }
 
 
-  private handleDocumentPointermove = (e: PointerEvent): void => {
+  private handleDocumentPointermove = (e: PointerEvent | TouchEvent): void => {
     // обновим view
     let props: { value: number, descriptor: 0 | 1 } | null = this.view.update(e);
 
@@ -101,7 +104,7 @@ class SliderController implements ISliderController {
     }
   }
 
-  private handleDocumentPointerup = (e: PointerEvent): void => {
+  private handleDocumentPointerup = (e: PointerEvent | TouchEvent): void => {
     if (!this.isFirstSlideOfroller) {
       this.dispatchCustomEvent('stop');
       this.isFirstSlideOfroller = true;
@@ -109,6 +112,7 @@ class SliderController implements ISliderController {
 
     // удалим обработчик на событие pointermove
     document.removeEventListener('pointermove', this.handleDocumentPointermove);
+    document.removeEventListener('touchmove', this.handleDocumentPointermove);
     this.view.throwRoller(this.currentRoller!);
   }
 

@@ -63,7 +63,7 @@ class SliderView implements ISliderView {
   }
 
   update(
-    value: number | PointerEvent,
+    value: number | PointerEvent | TouchEvent,
     descriptor?: 0 | 1
   ): { value: number, descriptor: 0 | 1 } | null {
     // вычислим смещение бегунка относительно шкалы
@@ -84,18 +84,18 @@ class SliderView implements ISliderView {
         descriptor = this.rollers.getDescriptor();
       }
 
-      if (value instanceof PointerEvent && value.type === 'pointerdown') {
-       this.addSmoothTransition(descriptor);
+      if (value instanceof Event && (value.type === 'pointerdown' || value.type === 'touchstart')) {
+        this.addSmoothTransition(descriptor);
       }
 
       // переместим бегунок
       this.rollers.slide(position, descriptor);
-
-      if (value instanceof PointerEvent && value.type === 'pointerdown') {
+      
+      if (value instanceof Event && (value.type === 'pointerdown' || value.type === 'touchstart')) {
         setTimeout(this.removeSmoothTransition, 300, descriptor)
       }
-
-      if (value instanceof PointerEvent && value.type === 'pointermove') {
+      
+      if (value instanceof Event && (value.type === 'pointermove' || value.type === 'touchmove')) {
        this.removeSmoothTransition(descriptor);
       }
       
@@ -123,7 +123,7 @@ class SliderView implements ISliderView {
     }
   }
 
-  takeRoller(roller: HTMLElement | PointerEvent): void {
+  takeRoller(roller: HTMLElement | PointerEvent | TouchEvent): void {
     if (roller instanceof HTMLElement) {
       this.rollers.determineDescriptor(roller);
       
@@ -148,13 +148,7 @@ class SliderView implements ISliderView {
 
     let posFirstRoller: number = this.rollers.getPosition(0);
     let posSecondRolller = this.rollers.getPosition(1);
-    let posCursor: number;
-
-    if (this.settings.type === 'horizontal') {
-      posCursor = roller.clientX - this.scale.getScaleOffset();
-    } else {
-      posCursor = roller.clientY - this.scale.getScaleOffset();
-    }
+    let posCursor: number = this.calcPosCursor(roller);
 
     let isNearestFirstRoller: boolean =
       Math.abs(posCursor - posFirstRoller) < Math.abs(posCursor - posSecondRolller);
@@ -191,6 +185,19 @@ class SliderView implements ISliderView {
 
   getSettings(): sliderSettings {
     return this.settings;
+  }
+
+  private calcPosCursor(event: PointerEvent | TouchEvent): number {
+    if (this.settings.type === 'horizontal') {
+      return (
+        event instanceof PointerEvent ? event.clientX: event.targetTouches[0].clientX
+      ) - this.scale.getScaleOffset();
+    } 
+
+    return (
+      event instanceof PointerEvent ? event.clientY: event.targetTouches[0].clientY
+    ) - this.scale.getScaleOffset();
+    
   }
 
   // вычисляет максимально и минимально допустимые смещения ролика
@@ -243,7 +250,7 @@ class SliderView implements ISliderView {
   }
 
   // расчитывает смещение бегунка относительно шкалы
-  private calcPosition(value: number | PointerEvent): number {
+  private calcPosition(value: number | PointerEvent | TouchEvent): number {
     let position: number;
 
     if (typeof value === 'number') {
@@ -258,19 +265,14 @@ class SliderView implements ISliderView {
       return position;
     }
 
-    if (this.settings.type === 'vertical') {
-      position = value.clientY - this.scale.getScaleOffset();
-    } else {
-      position = value.clientX - this.scale.getScaleOffset();
-    }
-
+    position = this.calcPosCursor(value);
     position -= this.rollers.getSize()/2;
 
     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     let validValue = this.getNearestValidValue(position);
     if (validValue !== position) return validValue;
 
-    if (value.type === 'pointermove') {
+    if (value.type === 'pointermove' || value.type === 'touchmove') {
       // вычислим на какое количество шагов необходимо сдвинуть бегунок
       let steps = this.calcCountSteps(position);
       position = this.rollers.getLastUpdatedPosition() + steps * this.scale.getStep();  
