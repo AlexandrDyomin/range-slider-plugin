@@ -21,6 +21,8 @@ class SliderController implements ISliderController {
     document.addEventListener('pointerup', this.handleDocumentPointerup);
     this.view.getSlider().addEventListener('touchstart', this.handleDocumentPointerdown);
     document.addEventListener('touchend', this.handleDocumentPointerup);
+    this.view.getSlider().addEventListener('keydown', this.handleSliderKeydown);
+
   }
 
   // возвращает значения бегунков
@@ -38,6 +40,34 @@ class SliderController implements ISliderController {
     } catch(e) {
         console.error(e);
     }
+  }
+
+  private handleSliderKeydown = (e: KeyboardEvent): void => {
+    const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+
+    if (keys.includes(e.key)) {
+      const step = this.slider.getStep();
+      const inputs = [...this.view.getInputs()];
+      const descriptor = inputs.indexOf(
+        inputs.filter((el) => el === document.activeElement)[0]);
+      let currentValue = typeof this.getValue() === 'number' ? 
+        <number>this.getValue() : (<[number, number]>this.getValue())[descriptor];     
+        let newValue = currentValue;
+      const [min, max] = this.slider.getLimits(descriptor);
+      
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        newValue = this.slider.checkValue(currentValue - step, descriptor) ? currentValue - step : min;
+          
+        // currentValue !== newValue && this.setValue(newValue, <0 | 1>descriptor);
+      }
+  
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        newValue = this.slider.checkValue(currentValue + step, descriptor) ?
+          currentValue + step : max;
+      }
+        
+      currentValue !== newValue && this.setValue(newValue, <0 | 1>descriptor);
+    }  
   }
 
   // обработчики событий указателя

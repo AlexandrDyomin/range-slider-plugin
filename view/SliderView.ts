@@ -30,7 +30,6 @@ class SliderView implements ISliderView {
     this.outputs = new Outputs(this.getOutputs(), settings);
     this.scale = new Scale(
       this.getScale(),
-      this.getRange(),
       this.rollers.getSize(),
       settings
     );
@@ -44,6 +43,10 @@ class SliderView implements ISliderView {
 
     // обновим положение бегунков в соответствие с переданными настройками
     this.settings.values.forEach( (value, i) => this.update(value, <0 | 1>i) );
+  }
+  
+  getDescriptor(): 0 | 1 {
+    return this.rollers.getDescriptor();
   }
 
   getRollersPositions(): [number, number?] {
@@ -70,11 +73,9 @@ class SliderView implements ISliderView {
     let position: number = this.calcPosition(value);
 
     // вычислим значение ролика и его номер
-    if (position !== this.rollers.getLastUpdatedPosition() ||
-        this.getSettings().values[0] === this.getSettings().values[1]
-       ) {
+    if (typeof value === 'number' || position !== this.rollers.getLastUpdatedPosition()) {
       let inputValue: number;
-
+      
       if (typeof value === 'number' && descriptor !== undefined) {
         // переместим бегунок
         this.rollers.slide(position, descriptor);
@@ -267,21 +268,19 @@ class SliderView implements ISliderView {
 
     position = this.calcPosCursor(value);
     position -= this.rollers.getSize()/2;
-
-    // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
+    
+     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     let validValue = this.getNearestValidValue(position);
     if (validValue !== position) return validValue;
 
-    if (value.type === 'pointermove' || value.type === 'touchmove') {
-      // вычислим на какое количество шагов необходимо сдвинуть бегунок
-      let steps = this.calcCountSteps(position);
-      position = this.rollers.getLastUpdatedPosition() + steps * this.scale.getStep();  
-    } 
+    // вычислим на какое количество шагов необходимо сдвинуть бегунок
+    let steps = this.calcCountSteps(position);
+    position = this.rollers.getLastUpdatedPosition() + steps * this.scale.getStep();  
 
     // если расчитаная позиция не в допустимом диапазоне вернем ближайшее допустимое значение
     validValue = this.getNearestValidValue(position);
     if (validValue !== position) return validValue;
-
+    
     return +position.toFixed(3);
   }
 
@@ -289,7 +288,6 @@ class SliderView implements ISliderView {
     if (value > this.maxLimit) {
       return this.maxLimit;
     }
-
     if (value < this.minLimit) {
       return this.minLimit;
     }

@@ -15,6 +15,7 @@ interface ISliderView {
   getInputs(): NodeList;
   getOutputs(): Node [];
   getRollersPositions(): [number, number?];
+  getDescriptor(): 0 | 1;
 }
 
 export type { ISliderView };

@@ -15,7 +15,7 @@ let hr: Slider = new Slider("hr", {
   step: 20,
   min: -50,
   max: 50,
-  values: [-20, 0],
+  values: [-7, 13],
   names: ["ddd", "sssdsd"],
   prefix: "$",
   grid: true,
@@ -54,5 +54,3 @@ let vr: Slider = new Slider("vr", {
   prefix: "$",
   grid: true
 });
-
-hr.setValue(33, 1)

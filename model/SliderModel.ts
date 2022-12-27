@@ -4,6 +4,8 @@ import type { IScale } from "./typingForScale";
 interface ISliderModel extends IScale{
   getValue(): [number, number] | number;
   setValue(value: number, descriptor: 0 | 1): void;
+  getLimits(descriptor: number): [number, number];
+  checkValue(value:number, descriptor: number): boolean;
 };
 
 class SliderModel implements ISliderModel {
@@ -60,7 +62,7 @@ class SliderModel implements ISliderModel {
     this.scale.setStep(value);
   }
 
-  private checkValue(value:number, descriptor: number): boolean {
+  getLimits(descriptor: number): [number, number] {
     let min: number;
     let max: number;
 
@@ -76,7 +78,11 @@ class SliderModel implements ISliderModel {
       min = this.scale.getMinValue();
       max = this.scale.getMaxValue();
     }
+    return [min, max];
+  }
 
+  checkValue(value:number, descriptor: number): boolean {
+    let [min, max] = this.getLimits(descriptor); 
     let isNotLess: boolean = value >= min;
     let isNotMore: boolean = value <= max;
     return isNotLess && isNotMore;

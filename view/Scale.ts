@@ -4,7 +4,6 @@ class Scale implements IScale {
   private step: number;                  // размер шага, px
   private scaleSize: number;             // ширина(высота) шкалы, px
   private scale: HTMLElement;
-  private range: HTMLElement;            // закрашиваемая часть шкалы
   private rollerSize: number;
   private zeroOffset: number;            // смещение нуля на шкале, px
   private scaleOffset: number;           // смещение шкалы относительно окна, px
@@ -13,13 +12,11 @@ class Scale implements IScale {
 
   constructor(
     scale: HTMLElement,
-    range: HTMLElement,
     rollerSize: number,
     settings: scaleSettings
   ) {
     this.settings = settings;
     this.scale = scale;
-    this.range = range;
     this.rollerSize = rollerSize;
     this.scaleSize = this.calcScaleSize();
     this.zeroOffset = this.caclZeroOffset();
