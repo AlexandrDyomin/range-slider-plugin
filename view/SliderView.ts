@@ -188,6 +188,12 @@ class SliderView implements ISliderView {
     return this.settings;
   }
 
+  setFocusOnRoller(): void {
+    const inputs = this.getInputs();
+    const descriptor = this.getDescriptor();
+    setTimeout(() => (<HTMLInputElement>inputs[descriptor]).focus(), 0);
+  }
+
   private calcPosCursor(event: PointerEvent | TouchEvent): number {
     if (this.settings.type === 'horizontal') {
       return (

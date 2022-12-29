@@ -22,7 +22,6 @@ class SliderController implements ISliderController {
     this.view.getSlider().addEventListener('touchstart', this.handleDocumentPointerdown);
     document.addEventListener('touchend', this.handleDocumentPointerup);
     this.view.getSlider().addEventListener('keydown', this.handleSliderKeydown);
-
   }
 
   // возвращает значения бегунков
@@ -76,13 +75,12 @@ class SliderController implements ISliderController {
       e.preventDefault();
     }
 
-    // добавим обработчик на событие pointermove если оно произошло на бегунке
     if (e instanceof TouchEvent || (e instanceof PointerEvent && e.button === 0)) {
       let target: HTMLElement = e.target as HTMLElement;
       let scale: HTMLElement = this.view.getScale();
       let range: HTMLElement = this.view.getRange();
-
-
+           
+      // добавим обработчик на событие pointermove если оно произошло на бегунке
       if (this.isRoller(target) || target === scale || target === range) {
         document.addEventListener('pointermove', this.handleDocumentPointermove);
         document.addEventListener('touchmove', this.handleDocumentPointermove);
@@ -106,6 +104,8 @@ class SliderController implements ISliderController {
         this.currentRoller = target;
         this.view.takeRoller(target);
       }
+
+      this.view.setFocusOnRoller();
     }
   }
 
