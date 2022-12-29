@@ -1,4 +1,6 @@
 $color: #C70039 ;
+$rollerDiametr: 24px;
+$sizeScale: 16px;
 
 .slider:active {
   -webkit-tap-highlight-color: transparent;
@@ -58,14 +60,12 @@ input {
   }
 }
 
-
 // шкала и закрашиваемый диапазон
 .slider__scale,
 .slider__range {
   border-radius: 10px;
   box-shadow: inset 0 0 3px 3px rgba(0, 0, 0, 0.3);
 }
-
 
 // шкала
 .slider__scale {
@@ -75,11 +75,11 @@ input {
 
   &_horizontal {
     width: 100%;
-    height: 16px;
+    height: $sizeScale
   }
 
   &_vertical {
-    width: 16px;
+    width: $sizeScale;
     min-height: 150px;
     height: 100%;
   }
@@ -121,21 +121,21 @@ input {
 }
 
 .grid__mark:first-child {
-  margin-left: 12px;
+  margin-left: calc($rollerDiametr / 2);
 }
 
 .slider__scale_vertical .grid__mark:first-child {
   margin-left: 0;
-  margin-bottom: 12px;
+  margin-bottom: calc($rollerDiametr / 2);
 }
 
 .grid__mark:last-child {
-  margin-right: 12px;
+  margin-right: calc($rollerDiametr / 2);
 }
 
 .slider__scale_vertical .grid__mark:last-child {
   margin-right: 0;
-  margin-top: 12px;
+  margin-top: calc($rollerDiametr / 2);
 }
 
 .grid__mark:nth-child(5n + 1) {
@@ -163,7 +163,6 @@ input {
   margin-right: 3px;
 }
 
-
 //  закрашиваемый диапазон
 .slider__range {
   background-color:  $color ;
@@ -173,21 +172,18 @@ input {
 .slider__scale_horizontal
 .slider__range {
   height: 100%;
-  // right: calc(100% - 24px);
 }
 
 .slider__scale_vertical
 .slider__range {
   width: 100%;
-  // bottom: calc(100% - 24px);
 }
-
 
 // бегунки
 .slider__roller_first,
 .slider__roller_second {
-  width: 24px;
-  height: 24px;
+  width: $rollerDiametr;
+  height: $rollerDiametr;
   position: absolute;
 
   border-radius: 50%;
@@ -198,11 +194,11 @@ input {
   &::after {
     content: "";
     display: block;
-    width: 12px;
-    height: 12px;
+    width: calc($rollerDiametr/2);
+    height: calc($rollerDiametr/2);
     position:absolute;
-    top: 12px;
-    left: 12px;
+    top: calc($rollerDiametr/2);
+    left: calc($rollerDiametr/2);
 
     transform: translate(-50%, -50%);
     background-color:  $color;
@@ -215,7 +211,7 @@ input {
 .slider__roller_first,
 .slider__scale_horizontal
 .slider__roller_second {
-  top: -4px;
+  top: calc(($sizeScale - $rollerDiametr) / 2);
   left: 0;
 }
 
@@ -224,7 +220,7 @@ input {
 .slider__scale_vertical
 .slider__roller_second {
   top: 0;
-  left: -4px;
+  left: calc(($sizeScale - $rollerDiametr) / 2);
 }
 
 .slider__roller_smooth,
