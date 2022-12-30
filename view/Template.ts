@@ -80,7 +80,7 @@ class Template implements ITemplate {
       <div class='${classNames}'>
         ${this.getTemplateForInputs()}
         <div class='slider__scale slider__scale_${ this.settings.type }'>
-          ${this.settings.grid && this.getTemplateForGrid()}
+          ${this.settings.grid ? this.getTemplateForGrid() : ''}
           ${this.getTemplateForRange()}
           ${this.getTemplateForRollers()}
         </div>

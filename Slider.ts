@@ -11,14 +11,15 @@ class Slider implements ISliderController {
   private controller: ISliderController;
   private settings: sliderSettings;
 
-  constructor(container: string, userSettings: object) {
+  constructor(container: string, userSettings: object = {}) {
     let defaultSettings: sliderSettings = {
       min: 0,
       max: 100,
       step: 1,
       type: 'horizontal',
       range: false,
-      values: [50]
+      values: [50],
+      grid: false,
     };
 
     let settings: sliderSettings;
