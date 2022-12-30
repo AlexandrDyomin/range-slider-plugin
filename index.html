@@ -8,25 +8,75 @@
   <title>Slider</title>
 </head>
 <body>
-  <!-- груговой слайдер -->
-    <!-- <svg width="100%" height="100%" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="50" fill="#e2dede" stroke="grey" />
-      <circle cx="50" cy="50" r="40" fill="white" stroke="grey" />
+  <div class="container">
+    <div id="demo"></div>
+    <form>
+      <fieldset>
+        <legend>Количество ползунков</legend>
+        <label for="default">1 ползунок</label>
+        <input id="default" type="radio" name="range">
+        <label for="range">2 ползунка</label>
+        <input id="range" type="radio" name="range">
+      </fieldset>
+  
+      <fieldset>
+        <legend>Шкала</legend>
+        
+        <label for="grid">Со шкалой</label>
+        <input id="grid" type="radio" name="grid">
+        <label for="no-grid">Без шкалы</label>
+        <input id="no-grid" type="radio" name="grid">
+      </fieldset>
+  
+      <fieldset>
+        <legend>Тип слайдера</legend>
+        
+        <label for="horizontal">Горизонтальный</label>
+        <input id="horizontal" type="radio" name="type">
+        <label for="vertical">Вертикальный</label>
+        <input id="vertical" type="radio" name="type">
+      </fieldset>
+  
+      <fieldset>
+        <legend>Диапазон значений</legend>
+       
+        <label for="min">Минимум</label>
+        <input id="min" type="number">
+        <label for="max">Максимум</label>
+        <input id="max" type="number">
+      </fieldset>
 
-      <circle cx="50" cy="50" r="45" fill="transparent" stroke="#00b4eb" stroke-width="9" stroke-dasharray="263.76"/>
-    </svg> -->
-  <style>
-    #h, #hr, #v, #vr {
-      padding: 30px 50px 30px;
-    }
-  </style>
+      <fieldset>
+        <legend>Шаг, с которым будет перемещаться ползунок</legend>
 
-  <div id="h"></div>
-  <div id="hr"></div>
-  <div id="v"></div>
-  <div id="vr"></div>
-  <input type="range" name="" id="" style="width: 100%;" max="100" step="20" value="5">
+        <label for="step">Шаг</label>
+        <input id="step"  type="number">
+      </fieldset>
 
-  <div id="box"></div>
+      <fieldset>
+        <legend>Значение при инициализации</legend>
+
+        <label for="value">Первый ползунок</label>
+        <input id="value" type="number">
+      </fieldset>
+
+      <fieldset>
+        <legend>Префикс</legend>
+        <label for="prefix">Префикс</label>
+        <input id="prefix"></input>
+      </fieldset>
+
+      <fieldset>
+        <legend>Атрибут <strong>name</strong>, по которому будет доступно значение слайдера</legend>
+        <label for="name_1">Первый ползунок</label>
+        <input id="name_1" type="text">
+      </fieldset>
+
+    </form>
+
+
+
+  </div>
+ 
 </body>
 </html>
