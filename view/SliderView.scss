@@ -16,6 +16,10 @@ $sizeScale: 16px;
 
 .slider {
   user-select: none;
+
+  &_vertical {
+    width: min-content;
+  }
 }
 
 // инпуты

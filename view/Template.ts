@@ -73,8 +73,11 @@ class Template implements ITemplate {
   }
 
   private getTemplateForSlider(): string {    
+    const classNames = this.settings.type === 'vertical' ? 
+      'slider slider_vertical' : 'slider';
+      
     return `
-      <div class='slider'>
+      <div class='${classNames}'>
         ${this.getTemplateForInputs()}
         <div class='slider__scale slider__scale_${ this.settings.type }'>
           ${this.settings.grid && this.getTemplateForGrid()}
